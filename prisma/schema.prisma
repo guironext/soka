@@ -1,0 +1,76 @@
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum Role {
+  ADMIN
+  COMITE_NATIONAL
+  CENTRE_GENERAL
+  CENTRE
+  CHAPITRE
+  DISTRICT
+  GROUPE
+  SOUS_GROUPE
+  MEMBRE
+}
+
+enum AccountStatus {
+  PENDING_INVITATION
+  PENDING_APPROVAL
+  ACTIVE
+}
+
+model User {
+  id        String         @id @default(cuid())
+  clerkId   String         @unique
+  email     String
+  role      Role?
+  status    AccountStatus  @default(PENDING_INVITATION)
+  /// Target role after invitation redeem; active `role` is set when fully approved.
+  pendingTargetRole Role?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  issuedInvitations Invitation[] @relation("InvitationIssuer")
+
+  approvalsGiven    OnboardingApproval[] @relation("ApprovalApprover")
+  approvalsReceived OnboardingApproval[] @relation("ApprovalSubject")
+}
+
+model Invitation {
+  id         String    @id @default(cuid())
+  codeHash   String    @unique
+  targetRole Role
+  issuerId   String
+  issuer     User      @relation("InvitationIssuer", fields: [issuerId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime?
+  maxUses    Int       @default(1)
+  uses       Int       @default(0)
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([issuerId])
+}
+
+model OnboardingApproval {
+  id             String   @id @default(cuid())
+  subjectUserId  String
+  subject        User     @relation("ApprovalSubject", fields: [subjectUserId], references: [id], onDelete: Cascade)
+  approverUserId String
+  approver       User     @relation("ApprovalApprover", fields: [approverUserId], references: [id], onDelete: Cascade)
+  /// Role the approver had at approval time (must match validation ladder).
+  approverRole   Role
+  createdAt      DateTime @default(now())
+
+  @@unique([subjectUserId, approverUserId])
+  @@index([subjectUserId])
+}
