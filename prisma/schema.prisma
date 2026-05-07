@@ -20,6 +20,14 @@ enum Role {
   GROUPE
   SOUS_GROUPE
   MEMBRE
+  DEPARTMENT_COMITE_NATIONAL
+  DEPARTMENT_CENTRE_GENERAL
+  DEPARTMENT_CENTRE
+  DEPARTMENT_CHAPITRE
+  DEPARTMENT_DISTRICT
+  DEPARTMENT_GROUPE
+  DEPARTMENT_SOUS_GROUPE
+  DEPARTMENT_MEMBRE
 }
 
 enum AccountStatus {
@@ -32,10 +40,17 @@ model User {
   id        String         @id @default(cuid())
   clerkId   String         @unique
   email     String
+  firstName String?
+  lastName  String?
+  phone     String?
   role      Role?
   status    AccountStatus  @default(PENDING_INVITATION)
   /// Target role after invitation redeem; active `role` is set when fully approved.
   pendingTargetRole Role?
+  /// User who issued the invitation code used for this account (first validation step).
+  invitedByUserId String?
+  invitedBy       User?   @relation("UserInvitedBy", fields: [invitedByUserId], references: [id], onDelete: SetNull)
+  invitedUsers    User[]  @relation("UserInvitedBy")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -44,10 +59,28 @@ model User {
 
   approvalsGiven    OnboardingApproval[] @relation("ApprovalApprover")
   approvalsReceived OnboardingApproval[] @relation("ApprovalSubject")
+
+  activationRequestsSent ActivationRequest[] @relation("ActivationRequestRequester")
+  activationRequestsToMe ActivationRequest[] @relation("ActivationRequestRecipient")
+}
+
+/// Recorded when a pending member asks their invitation issuer to proceed with activation / second validation.
+model ActivationRequest {
+  id          String   @id @default(cuid())
+  requesterId String
+  requester   User     @relation("ActivationRequestRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  recipientId String
+  recipient   User     @relation("ActivationRequestRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@index([recipientId])
+  @@index([requesterId])
 }
 
 model Invitation {
   id         String    @id @default(cuid())
+  /// Fonction / mission confiée à l’invité (ex. trésorerie, communication).
+  responsabilite String?
   codeHash   String    @unique
   targetRole Role
   issuerId   String

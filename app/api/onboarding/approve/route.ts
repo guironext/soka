@@ -76,6 +76,7 @@ export async function POST(req: Request) {
       await syncClerkAppMetadata(clerkId, {
         status: finalUser.status,
         role: finalUser.role,
+        pendingTargetRole: finalUser.pendingTargetRole ?? null,
       });
       return NextResponse.json({ ok: true, activated: true, role: finalUser.role });
     }

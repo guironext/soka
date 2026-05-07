@@ -12,6 +12,7 @@ export function getMissingApproverRoles(
   if (!required) return [];
 
   const [a, b] = required;
+
   const hasA = approvals.some((x) => x.approverRole === a);
   const hasB = approvals.some((x) => x.approverRole === b);
   const missing: Role[] = [];

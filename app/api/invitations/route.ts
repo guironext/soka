@@ -1,20 +1,16 @@
 import { NextResponse } from "next/server";
 import type { Role } from "@/app/generated/prisma";
 import { prisma } from "@/lib/prisma";
-import { canIssueInvitation } from "@/lib/roles";
+import { ALL_KNOWN_ROLES, canIssueInvitation } from "@/lib/roles";
 import { generateInvitationCode, hashInvitationCode } from "@/lib/invitation-code";
 import { requireActiveAppUser } from "@/lib/app-user";
+import { getAppOrigin } from "@/lib/app-url";
 
-const VALID_ROLES: Role[] = [
-  "COMITE_NATIONAL",
-  "CENTRE_GENERAL",
-  "CENTRE",
-  "CHAPITRE",
-  "DISTRICT",
-  "GROUPE",
-  "SOUS_GROUPE",
-  "MEMBRE",
-];
+const VALID_ROLES: Role[] = [...ALL_KNOWN_ROLES];
+
+const RESPONSABILITE_MAX = 500;
+/** Max length embedded in invite URL (évite URLs excessives). */
+const RESPONSABILITE_URL_MAX = 220;
 
 export async function POST(req: Request) {
   try {
@@ -23,6 +19,7 @@ export async function POST(req: Request) {
       targetRole?: string;
       expiresInDays?: number;
       maxUses?: number;
+      responsabilite?: string;
     };
     const targetRole = body.targetRole as Role | undefined;
     if (!targetRole || !VALID_ROLES.includes(targetRole)) {
@@ -30,6 +27,21 @@ export async function POST(req: Request) {
     }
     if (!canIssueInvitation(issuer.role, targetRole)) {
       return NextResponse.json({ error: "Cannot issue invitation for this role" }, { status: 403 });
+    }
+
+    const responsabiliteRaw =
+      typeof body.responsabilite === "string" ? body.responsabilite.trim() : "";
+    if (!responsabiliteRaw) {
+      return NextResponse.json(
+        { error: "La responsabilité est requise" },
+        { status: 400 },
+      );
+    }
+    if (responsabiliteRaw.length > RESPONSABILITE_MAX) {
+      return NextResponse.json(
+        { error: `La responsabilité ne peut pas dépasser ${RESPONSABILITE_MAX} caractères` },
+        { status: 400 },
+      );
     }
 
     const plain = generateInvitationCode();
@@ -41,6 +53,7 @@ export async function POST(req: Request) {
     await prisma.invitation.create({
       data: {
         codeHash,
+        responsabilite: responsabiliteRaw,
         targetRole,
         issuerId: issuer.id,
         expiresAt,
@@ -48,9 +61,20 @@ export async function POST(req: Request) {
       },
     });
 
+    const inviteUrl = new URL("/onboarding", `${getAppOrigin()}/`);
+    inviteUrl.searchParams.set("code", plain);
+    inviteUrl.searchParams.set("role", targetRole);
+    const forUrl =
+      responsabiliteRaw.length <= RESPONSABILITE_URL_MAX
+        ? responsabiliteRaw
+        : `${responsabiliteRaw.slice(0, RESPONSABILITE_URL_MAX - 1)}…`;
+    inviteUrl.searchParams.set("responsabilite", forUrl);
+
     return NextResponse.json({
       code: plain,
       targetRole,
+      responsabilite: responsabiliteRaw,
+      inviteUrl: inviteUrl.toString(),
       expiresAt: expiresAt.toISOString(),
       maxUses,
     });

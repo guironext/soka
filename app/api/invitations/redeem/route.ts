@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashInvitationCode } from "@/lib/invitation-code";
-import { canIssueInvitation } from "@/lib/roles";
-import { syncClerkAppMetadata } from "@/lib/clerk-sync";
 import { requireClerkAuth, getAppUserByClerkId } from "@/lib/app-user";
+import { syncClerkAppMetadata } from "@/lib/clerk-sync";
+import { canIssueInvitation } from "@/lib/roles";
 
 export async function POST(req: Request) {
   try {
@@ -18,8 +18,16 @@ export async function POST(req: Request) {
     if (!user) {
       return NextResponse.json({ error: "User not provisioned yet" }, { status: 404 });
     }
-    if (user.status === "ACTIVE") {
-      return NextResponse.json({ error: "Account already active" }, { status: 400 });
+    if (user.status !== "PENDING_INVITATION") {
+      return NextResponse.json(
+        {
+          error:
+            user.status === "PENDING_APPROVAL"
+              ? "Validation déjà en cours — votre premier code a été accepté"
+              : "Compte déjà actif",
+        },
+        { status: 400 },
+      );
     }
 
     const codeHash = hashInvitationCode(code);
@@ -46,6 +54,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invitation no longer valid" }, { status: 400 });
     }
 
+    const targetRole = invitation.targetRole;
+
     await prisma.$transaction([
       prisma.invitation.update({
         where: { id: invitation.id },
@@ -55,7 +65,9 @@ export async function POST(req: Request) {
         where: { id: user.id },
         data: {
           status: "PENDING_APPROVAL",
-          pendingTargetRole: invitation.targetRole,
+          role: null,
+          pendingTargetRole: targetRole,
+          invitedByUserId: issuer.id,
         },
       }),
     ]);
@@ -64,11 +76,14 @@ export async function POST(req: Request) {
     await syncClerkAppMetadata(clerkId, {
       status: updated.status,
       role: updated.role,
+      pendingTargetRole: updated.pendingTargetRole ?? null,
     });
 
     return NextResponse.json({
       status: updated.status,
+      role: updated.role,
       pendingTargetRole: updated.pendingTargetRole,
+      redirectTo: "/dashboard",
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Error";

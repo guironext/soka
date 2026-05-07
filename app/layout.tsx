@@ -3,6 +3,8 @@ import { frFR } from "@clerk/localizations";
 import { ClerkProvider, Show, SignInButton, UserButton } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,7 +29,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider localization={frFR}>
+    <ClerkProvider
+      localization={frFR}
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      unsafe_disableDevelopmentModeConsoleWarning={process.env.NODE_ENV === "development"}
+    >
       <html
         lang="fr"
         className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
@@ -37,33 +44,33 @@ export default function RootLayout({
           className="flex min-h-full flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50"
           suppressHydrationWarning
         >
-          <header className="flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
-            <Link href="/" className="font-semibold tracking-tight">
-              Soka Hub
-            </Link>
-            <nav className="flex items-center gap-4 text-sm">
-              <Show when="signed-out">
-                <SignInButton mode="modal">
-                  <button
-                    type="button"
-                    className="text-zinc-700 dark:text-zinc-300"
-                  >
-                    Connexion
-                  </button>
-                </SignInButton>
-              </Show>
-              <Show when="signed-in">
-                <Link href="/dashboard" className="text-zinc-700 dark:text-zinc-300">
-                  Tableau de bord
-                </Link>
-                <Link href="/onboarding" className="text-zinc-700 dark:text-zinc-300">
-                  Intégration
-                </Link>
-                <UserButton />
-              </Show>
-            </nav>
-          </header>
-          <div className="flex flex-1 flex-col">{children}</div>
+          <TooltipProvider delayDuration={0}>
+            <header className="flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
+              <Link href="/" className="font-semibold tracking-tight uppercase">
+                Soka Gakkai Côte d&apos;Ivoire
+              </Link>
+              <nav className="flex items-center gap-4 text-sm">
+                <Show when="signed-out">
+                  <SignInButton mode="modal">
+                    <button
+                      type="button"
+                      className="text-zinc-700 dark:text-zinc-300"
+                    >
+                      Connexion
+                    </button>
+                  </SignInButton>
+                </Show>
+                <Show when="signed-in">
+                  <Link href="/onboarding" className="text-zinc-700 dark:text-zinc-300">
+                    Intégration
+                  </Link>
+                  <UserButton />
+                </Show>
+              </nav>
+            </header>
+            <div className="flex flex-1 flex-col">{children}</div>
+            <Toaster richColors position="top-right" />
+          </TooltipProvider>
         </body>
       </html>
     </ClerkProvider>

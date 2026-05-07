@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
       await syncClerkAppMetadata(data.id, {
         status: user.status,
         role: user.role,
+        pendingTargetRole: user.pendingTargetRole ?? null,
       });
     }
   }
