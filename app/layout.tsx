@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { frFR } from "@clerk/localizations";
-import { ClerkProvider, Show, SignInButton, UserButton } from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { HeaderAuthNav } from "@/components/HeaderAuthNav";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
@@ -49,24 +50,7 @@ export default function RootLayout({
               <Link href="/" className="font-semibold tracking-tight uppercase">
                 Soka Gakkai Côte d&apos;Ivoire
               </Link>
-              <nav className="flex items-center gap-4 text-sm">
-                <Show when="signed-out">
-                  <SignInButton mode="modal">
-                    <button
-                      type="button"
-                      className="text-zinc-700 dark:text-zinc-300"
-                    >
-                      Connexion
-                    </button>
-                  </SignInButton>
-                </Show>
-                <Show when="signed-in">
-                  <Link href="/onboarding" className="text-zinc-700 dark:text-zinc-300">
-                    Intégration
-                  </Link>
-                  <UserButton />
-                </Show>
-              </nav>
+              <HeaderAuthNav />
             </header>
             <div className="flex flex-1 flex-col">{children}</div>
             <Toaster richColors position="top-right" />

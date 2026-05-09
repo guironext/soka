@@ -1,7 +1,7 @@
 "use client";
 
 import { Clock, Mail, Phone } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import type { Role } from "@/app/generated/prisma";
 import { ActivateUserButton } from "@/app/(users)/admin/a-actives/activate-user-button";
 import { Badge } from "@/components/ui/badge";
@@ -54,9 +54,41 @@ function initials(
 
 type Props = {
   initialRows: PendingLeaderRow[];
+  /** Small uppercase label above the title (e.g. section name). */
+  sectionLabel?: string;
+  /** Main H1; defaults to the admin wording. */
+  pageHeading?: string;
+  /** Subtitle under the title. */
+  description?: ReactNode;
+  /** Body text when the table is empty. */
+  emptyStateDescription?: string;
+  /** `id` for the heading (table `aria-labelledby`). */
+  headingId?: string;
+  /** When false, hides the Action column. */
+  showActivateColumn?: boolean;
+  /** POST URL for the activate button (default: `/api/admin/activate-user`). */
+  activateEndpoint?: string;
+  /** Button label (default: `ACTIVER`). */
+  activateButtonLabel?: string;
 };
 
-export function PendingLeadersView({ initialRows }: Props) {
+export function PendingLeadersView({
+  initialRows,
+  sectionLabel = "Administration",
+  pageHeading = "Comptes en attente d'approbation",
+  description = (
+    <>
+      Utilisateurs au statut{" "}
+      <span className="font-medium text-foreground">PENDING_APPROVAL</span> qui
+      n&apos;ont pas encore de rôle attribué.
+    </>
+  ),
+  emptyStateDescription = "Aucun utilisateur n'a le statut «\u00a0PENDING_APPROVAL\u00a0» sans rôle attribué.",
+  headingId = "a-actives-pending-heading",
+  showActivateColumn = true,
+  activateEndpoint,
+  activateButtonLabel,
+}: Props) {
   const [rows, setRows] = useState(initialRows);
 
   const handleActivated = useCallback((userId: string) => {
@@ -71,21 +103,17 @@ export function PendingLeadersView({ initialRows }: Props) {
             <div className="space-y-3">
               <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-700/90 dark:text-amber-400/90">
                 <Clock className="size-3.5" aria-hidden />
-                Administration
+                {sectionLabel}
               </p>
               <div className="border-l-4 border-amber-500 pl-4">
                 <h1
-                  id="a-actives-pending-heading"
+                  id={headingId}
                   className="font-heading text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-50"
                 >
-                  Comptes en attente d&apos;approbation
+                  {pageHeading}
                 </h1>
                 <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                  Utilisateurs au statut{" "}
-                  <span className="font-medium text-foreground">
-                    PENDING_APPROVAL
-                  </span>{" "}
-                  qui n&apos;ont pas encore de rôle attribué.
+                  {description}
                 </p>
               </div>
             </div>
@@ -113,14 +141,13 @@ export function PendingLeadersView({ initialRows }: Props) {
                 Aucune demande en attente
               </p>
               <p className="text-sm text-muted-foreground">
-                Aucun utilisateur n&apos;a le statut «&nbsp;PENDING_APPROVAL&nbsp;»
-                sans rôle attribué.
+                {emptyStateDescription}
               </p>
             </div>
           </Card>
         ) : (
           <Card
-            aria-labelledby="a-actives-pending-heading"
+            aria-labelledby={headingId}
             className="overflow-hidden border-zinc-200 bg-white p-0 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
           >
             <Table>
@@ -131,7 +158,9 @@ export function PendingLeadersView({ initialRows }: Props) {
                   <TableHead>Téléphone</TableHead>
                   <TableHead>Rôle cible</TableHead>
                   <TableHead>Inscrit le</TableHead>
-                  <TableHead className="pr-4 text-right">Action</TableHead>
+                  {showActivateColumn ? (
+                    <TableHead className="pr-4 text-right">Action</TableHead>
+                  ) : null}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -196,15 +225,19 @@ export function PendingLeadersView({ initialRows }: Props) {
                       <TableCell className="text-sm tabular-nums text-muted-foreground">
                         {dateFormatter.format(u.createdAt)}
                       </TableCell>
-                      <TableCell className="pr-4 text-right">
-                        <div className="flex justify-end">
-                          <ActivateUserButton
-                            userId={u.id}
-                            disabled={!u.pendingTargetRole}
-                            onActivated={handleActivated}
-                          />
-                        </div>
-                      </TableCell>
+                      {showActivateColumn ? (
+                        <TableCell className="pr-4 text-right">
+                          <div className="flex justify-end">
+                            <ActivateUserButton
+                              userId={u.id}
+                              disabled={!u.pendingTargetRole}
+                              onActivated={handleActivated}
+                              endpoint={activateEndpoint}
+                              label={activateButtonLabel}
+                            />
+                          </div>
+                        </TableCell>
+                      ) : null}
                     </TableRow>
                   );
                 })}

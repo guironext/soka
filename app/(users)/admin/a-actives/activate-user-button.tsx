@@ -10,10 +10,14 @@ type Props = {
   userId: string;
   disabled?: boolean;
   className?: string;
+  /** POST endpoint; defaults to admin activation. */
+  endpoint?: string;
+  /** Visible label on the button. */
+  label?: string;
   /**
-   * Called after a successful POST to /api/admin/activate-user. The parent is
-   * expected to drop this user from its local state so the row disappears
-   * immediately, without waiting for a server-component refetch.
+   * Called after a successful POST. The parent is expected to drop this user
+   * from its local state so the row disappears immediately, without waiting for
+   * a server-component refetch.
    */
   onActivated?: (userId: string) => void;
 };
@@ -22,6 +26,8 @@ export function ActivateUserButton({
   userId,
   disabled,
   className,
+  endpoint = "/api/admin/activate-user",
+  label = "ACTIVER",
   onActivated,
 }: Props) {
   const router = useRouter();
@@ -30,7 +36,7 @@ export function ActivateUserButton({
   async function onActivate() {
     setPending(true);
     try {
-      const res = await fetch("/api/admin/activate-user", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId }),
@@ -88,7 +94,7 @@ export function ActivateUserButton({
       )}
       onClick={onActivate}
     >
-      {pending ? "…" : "ACTIVER"}
+      {pending ? "…" : label}
     </Button>
   );
 }

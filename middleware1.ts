@@ -67,6 +67,7 @@ const isOnboardingSupportApi = createRouteMatcher([
 const isAdminSupportApi = createRouteMatcher([
   "/api/onboarding/approve",
   "/api/invitations",
+  "/api/comite-national/(.*)",
 ]);
 
 function redirect(req: NextRequest, pathname: string) {

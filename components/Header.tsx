@@ -1,8 +1,6 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { Show, UserButton } from "@clerk/nextjs";
 import { SignInButtonWithFallback } from "@/components/SignInButtonWithFallback";
 import { Button } from "./ui/button";
@@ -11,13 +9,6 @@ import Image from "next/image";
 
 const Header = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
   const { isLoaded, isSignedIn, user } = useUser();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (isLoaded && !isSignedIn) {
-      router.push("/");
-    }
-  }, [isLoaded, isSignedIn, router]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-backdrop-filter:bg-white/60 shadow-sm">

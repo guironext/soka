@@ -23,7 +23,7 @@ import clsx from "clsx";
 import { usePathname } from "next/navigation";
 
 /**
- * Sidebar — Comité National.
+ * Sidebar — Centre Général.
  * Palette: blue / yellow / red (matching brand). Three-tone, never mixed per item.
  */
 type Category = "main" | "operations" | "communication";
@@ -38,24 +38,24 @@ type NavItem = {
 };
 
 const navItems: readonly NavItem[] = [
-  { id: 0, icon: Landmark, label: "Accueil", href: "/comite_national", category: "main", tone: "blue" },
-  { id: 1, icon: Home, label: "Invitations", href: "/comite_national/invitations", category: "main", tone: "yellow" },
-  { id: 2, icon: UserPlus, label: "A-Actives", href: "/comite_national/a-actives", category: "main", tone: "blue" },
+  { id: 0, icon: Landmark, label: "Accueil", href: "/centre", category: "main", tone: "blue" },
+  { id: 1, icon: Home, label: "Invitations", href: "/centre/invitations", category: "main", tone: "yellow" },
+  { id: 2, icon: UserPlus, label: "A-Actives", href: "/centre/a-actives", category: "main", tone: "blue" },
 
-  { id: 3, icon: Store, label: "Boutiques", href: "/comite_national/boutiques", category: "operations", tone: "yellow" },
-  { id: 4, icon: FileText, label: "Abonnements", href: "/comite_national/abonnements", category: "operations", tone: "blue" },
-  { id: 5, icon: Coins, label: "Zaïmu", href: "/comite_national/zaimu", category: "operations", tone: "yellow" },
-  { id: 6, icon: UserCheck, label: "Utilisateurs actifs", href: "/comite_national/utilisateurs-actifs", category: "operations", tone: "red" },
-  { id: 7, icon: UserX, label: "Utilisateurs passifs", href: "/comite_national/utilisateurs-passifs", category: "operations", tone: "red" },
-  { id: 8, icon: MapPinned, label: "Centres", href: "/comite_national/centres", category: "operations", tone: "blue" },
-  { id: 9, icon: BookOpen, label: "Chapitres", href: "/comite_national/chapitres", category: "operations", tone: "yellow" },
-  { id: 10, icon: UsersRound, label: "Groupes", href: "/comite_national/groupes", category: "operations", tone: "red" },
-  { id: 11, icon: Layers, label: "Sous-groupes", href: "/comite_national/sous-groupes", category: "operations", tone: "blue" },
-  { id: 12, icon: Users, label: "Membres", href: "/comite_national/membres", category: "operations", tone: "yellow" },
-  { id: 13, icon: LayoutGrid, label: "Départements", href: "/comite_national/departements", category: "operations", tone: "red" },
+  { id: 3, icon: Store, label: "Boutiques", href: "/centre/boutiques", category: "operations", tone: "yellow" },
+  { id: 4, icon: FileText, label: "Abonnements", href: "/centre/abonnements", category: "operations", tone: "blue" },
+  { id: 5, icon: Coins, label: "Zaïmu", href: "/centre/zaimu", category: "operations", tone: "yellow" },
+  { id: 6, icon: UserCheck, label: "Utilisateurs actifs", href: "/centre/utilisateurs-actifs", category: "operations", tone: "red" },
+  { id: 7, icon: UserX, label: "Utilisateurs passifs", href: "/centre/utilisateurs-passifs", category: "operations", tone: "red" },
+  { id: 8, icon: MapPinned, label: "Centres", href: "/centre/centres", category: "operations", tone: "blue" },
+  { id: 9, icon: BookOpen, label: "Chapitres", href: "/centre/chapitres", category: "operations", tone: "yellow" },
+  { id: 10, icon: UsersRound, label: "Groupes", href: "/centre/groupes", category: "operations", tone: "red" },
+  { id: 11, icon: Layers, label: "Sous-groupes", href: "/centre/sous-groupes", category: "operations", tone: "blue" },
+  { id: 12, icon: Users, label: "Membres", href: "/centre_general/membres", category: "operations", tone: "yellow" },
+  { id: 13, icon: LayoutGrid, label: "Départements", href: "/centre/departements", category: "operations", tone: "red" },
 
-  { id: 14, icon: MessageSquare, label: "Messages", href: "/comite_national/messages", category: "communication", tone: "blue" },
-  { id: 15, icon: User, label: "Profil", href: "/comite_national/profil", category: "main", tone: "red" },
+  { id: 14, icon: MessageSquare, label: "Messages", href: "/centre/messages", category: "communication", tone: "blue" },
+  { id: 15, icon: User, label: "Profil", href: "/centre/profile", category: "main", tone: "red" },
 ] as const;
 
 const categoryLabels: Record<Category, string> = {
@@ -79,11 +79,11 @@ const toneIdle: Record<NavItem["tone"], string> = {
 function isNavActive(pathname: string, href: string) {
   if (pathname === href) return true;
   // Root section path must not match all child routes — only exact match counts.
-  if (href === "/comite_national") return false;
+  if (href === "/centre_general" || href === "/centre") return false;
   return pathname.startsWith(`${href}/`);
 }
 
-const SidebarComiteNational = ({ isOpen }: { isOpen: boolean }) => {
+const Sidebar_Centre = ({ isOpen }: { isOpen: boolean }) => {
   const pathname = usePathname();
 
   const groupedItems = navItems.reduce<Record<Category, NavItem[]>>(
@@ -117,13 +117,13 @@ const SidebarComiteNational = ({ isOpen }: { isOpen: boolean }) => {
               >
                 <Landmark className="size-4.5" />
                 <span className="absolute -bottom-1 -right-1 rounded-full bg-yellow-400 px-1 text-[9px] font-bold leading-none text-blue-900 shadow-sm ring-1 ring-white dark:ring-zinc-950">
-                  CN
+                  CG
                 </span>
               </div>
               {isOpen && (
                 <div className="min-w-0">
                   <p className="truncate bg-linear-to-r from-blue-800 via-blue-700 to-blue-600 bg-clip-text text-sm font-bold tracking-tight text-transparent dark:from-white dark:via-blue-200 dark:to-yellow-300">
-                    Comité National
+                    Centre
                   </p>
                   <p className="truncate text-xs font-medium text-blue-800/90 dark:text-blue-300/90">
                     Soka Hub
@@ -136,7 +136,7 @@ const SidebarComiteNational = ({ isOpen }: { isOpen: boolean }) => {
           {/* Navigation */}
           <nav
             className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-2 py-4"
-            aria-label="Navigation Comité National"
+            aria-label="Navigation Centre Général"
           >
             {(Object.keys(categoryLabels) as Category[]).map((category) => {
               const items = groupedItems[category];
@@ -249,4 +249,4 @@ const SidebarComiteNational = ({ isOpen }: { isOpen: boolean }) => {
   );
 };
 
-export default SidebarComiteNational;
+export default Sidebar_Centre;

@@ -9,7 +9,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
 enum Role {
   ADMIN
   COMITE_NATIONAL
@@ -37,20 +36,20 @@ enum AccountStatus {
 }
 
 model User {
-  id        String         @id @default(cuid())
-  clerkId   String         @unique
-  email     String
-  firstName String?
-  lastName  String?
-  phone     String?
-  role      Role?
-  status    AccountStatus  @default(PENDING_INVITATION)
+  id                String        @id @default(cuid())
+  clerkId           String        @unique
+  email             String
+  firstName         String?
+  lastName          String?
+  phone             String?
+  role              Role?
+  status            AccountStatus @default(PENDING_INVITATION)
   /// Target role after invitation redeem; active `role` is set when fully approved.
   pendingTargetRole Role?
   /// User who issued the invitation code used for this account (first validation step).
-  invitedByUserId String?
-  invitedBy       User?   @relation("UserInvitedBy", fields: [invitedByUserId], references: [id], onDelete: SetNull)
-  invitedUsers    User[]  @relation("UserInvitedBy")
+  invitedByUserId   String?
+  invitedBy         User?         @relation("UserInvitedBy", fields: [invitedByUserId], references: [id], onDelete: SetNull)
+  invitedUsers      User[]        @relation("UserInvitedBy")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -62,6 +61,9 @@ model User {
 
   activationRequestsSent ActivationRequest[] @relation("ActivationRequestRequester")
   activationRequestsToMe ActivationRequest[] @relation("ActivationRequestRecipient")
+
+  responsabiliteId String?
+  responsabilite   Responsabilite? @relation(fields: [responsabiliteId], references: [id], onDelete: SetNull)
 }
 
 /// Recorded when a pending member asks their invitation issuer to proceed with activation / second validation.
@@ -78,18 +80,18 @@ model ActivationRequest {
 }
 
 model Invitation {
-  id         String    @id @default(cuid())
+  id             String    @id @default(cuid())
   /// Fonction / mission confiée à l’invité (ex. trésorerie, communication).
   responsabilite String?
-  codeHash   String    @unique
-  targetRole Role
-  issuerId   String
-  issuer     User      @relation("InvitationIssuer", fields: [issuerId], references: [id], onDelete: Cascade)
-  expiresAt  DateTime?
-  maxUses    Int       @default(1)
-  uses       Int       @default(0)
-  revokedAt  DateTime?
-  createdAt  DateTime  @default(now())
+  codeHash       String    @unique
+  targetRole     Role
+  issuerId       String
+  issuer         User      @relation("InvitationIssuer", fields: [issuerId], references: [id], onDelete: Cascade)
+  expiresAt      DateTime?
+  maxUses        Int       @default(1)
+  uses           Int       @default(0)
+  revokedAt      DateTime?
+  createdAt      DateTime  @default(now())
 
   @@index([issuerId])
 }
@@ -106,4 +108,26 @@ model OnboardingApproval {
 
   @@unique([subjectUserId, approverUserId])
   @@index([subjectUserId])
+}
+
+model Responsabilite {
+  id          String   @id @default(cuid())
+  niveau      String
+  description String?
+  niveau_responsabilite String
+  centre_general String?
+  centre String?
+  chapitre String?
+  district String?
+  groupe String?
+  sous_groupe String?
+  department_comite_national String?
+  department_centre_general String?
+  department_centre String?
+  department_chapitre String?
+  department_district String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users User[]
 }

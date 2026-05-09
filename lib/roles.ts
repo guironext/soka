@@ -66,7 +66,7 @@ export const ROLE_RULES: RoleRule[] = [
   },
   {
     targetRole: "DISTRICT",
-    allowedIssuerRoles: ["CHAPITRE", "COMITE_NATIONAL"],
+    allowedIssuerRoles: ["CHAPITRE", "CENTRE", "COMITE_NATIONAL"],
     requiredApproverRoles: ["CHAPITRE", "CENTRE"],
   },
   {

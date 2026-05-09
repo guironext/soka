@@ -5,7 +5,7 @@ import { getAppUserByClerkId } from "@/lib/app-user";
 import { dashboardPathForRole } from "@/lib/roles";
 import { ComiteNationalInvitationForm } from "./invitation-form";
 
-const ALLOWED_TARGETS = new Set<Role>(["CENTRE", "DISTRICT"]);
+const ALLOWED_TARGETS = new Set<Role>(["CENTRE_GENERAL", "CENTRE"]);
 
 export default async function ComiteNationalInvitationsPage() {
   const { userId } = await auth();
@@ -25,8 +25,8 @@ export default async function ComiteNationalInvitationsPage() {
   const roleOptions =
     user.status === "ACTIVE"
       ? [
+          { value: "CENTRE_GENERAL" as const, label: "Centre général" },
           { value: "CENTRE" as const, label: "Centre" },
-          { value: "DISTRICT" as const, label: "District" },
         ].filter((o) => ALLOWED_TARGETS.has(o.value as Role))
       : [];
 
