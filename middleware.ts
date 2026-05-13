@@ -176,7 +176,8 @@ function redirectForPendingTargetIfNeeded(
 export default clerkMiddleware(
 	async (auth, req: NextRequest) => {
 		const { userId, sessionClaims, redirectToSignIn } = await auth();
-		const md = sessionClaims?.metadata;
+		/** Clerk types `metadata` loosely; align with `CustomJwtSessionClaims` in `types/globals.d.ts`. */
+		const md = sessionClaims?.metadata as CustomJwtSessionClaims["metadata"];
 		const appRole = sokaRoleFromClaims(sessionClaims);
 		const pendingRole = pendingTargetRoleFromClaims(sessionClaims);
 		const { pathname } = req.nextUrl;
