@@ -3,7 +3,8 @@
  * clients drop the response early (see https://github.com/prisma/studio/issues/1479).
  * Does not affect the Studio UI or database access.
  *
- * Prefer `npm run db:studio` instead of plain `npx prisma studio` if you want this filtering.
+ * Prefer `npm run db:studio` instead of plain `npx prisma studio` if you want this filtering
+ * and to avoid Node DEP0190 from `npx`/`shell` spawning on recent Node versions.
  */
 const { spawn } = require("node:child_process");
 const path = require("node:path");
@@ -12,10 +13,13 @@ const readline = require("node:readline");
 const root = path.join(__dirname, "..");
 const studioArgs = process.argv.slice(2);
 
-const child = spawn("npx", ["prisma", "studio", ...studioArgs], {
+/** Local Prisma CLI via Node (no shell, avoids Node DEP0190 from shell+args). */
+const prismaCli = path.join(root, "node_modules", "prisma", "build", "index.js");
+
+const child = spawn(process.execPath, [prismaCli, "studio", ...studioArgs], {
   cwd: root,
   stdio: ["inherit", "inherit", "pipe"],
-  shell: true,
+  shell: false,
   env: process.env,
 });
 
