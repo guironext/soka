@@ -9,8 +9,8 @@ export const ROLE_RANK: Record<Role, number> = {
   COMITE_NATIONAL: 19,
   DEPARTMENT_COMITE_NATIONAL: 18,
   REGION: 17,
-  CENTRE_GENERAL: 16,
-  DEPARTMENT_CENTRE_GENERAL: 15,
+  CENTRE_REGION: 16,
+  DEPARTMENT_CENTRE_REGION: 15,
   CENTRE: 14,
   DEPARTMENT_CENTRE: 13,
   CHAPITRE: 12,
@@ -56,19 +56,19 @@ export const ROLE_RULES: RoleRule[] = [
     requiredApproverRoles: ["COMITE_NATIONAL", "ADMIN"],
   },
   {
-    targetRole: "CENTRE_GENERAL",
+    targetRole: "CENTRE_REGION",
     allowedIssuerRoles: ["COMITE_NATIONAL", "ADMIN"],
     requiredApproverRoles: ["COMITE_NATIONAL", "ADMIN"],
   },
   {
     targetRole: "CENTRE",
-    allowedIssuerRoles: ["CENTRE_GENERAL", "COMITE_NATIONAL"],
-    requiredApproverRoles: ["CENTRE_GENERAL", "COMITE_NATIONAL"],
+    allowedIssuerRoles: ["CENTRE_REGION", "COMITE_NATIONAL"],
+    requiredApproverRoles: ["CENTRE_REGION", "COMITE_NATIONAL"],
   },
   {
     targetRole: "CHAPITRE",
     allowedIssuerRoles: ["CENTRE"],
-    requiredApproverRoles: ["CENTRE", "CENTRE_GENERAL"],
+    requiredApproverRoles: ["CENTRE", "CENTRE_REGION"],
   },
   {
     targetRole: "DISTRICT",
@@ -96,19 +96,19 @@ export const ROLE_RULES: RoleRule[] = [
     requiredApproverRoles: ["ADMIN", "COMITE_NATIONAL"],
   },
   {
-    targetRole: "DEPARTMENT_CENTRE_GENERAL",
+    targetRole: "DEPARTMENT_CENTRE_REGION",
     allowedIssuerRoles: ["COMITE_NATIONAL", "ADMIN", "DEPARTMENT_COMITE_NATIONAL"],
     requiredApproverRoles: ["COMITE_NATIONAL", "ADMIN"],
   },
   {
     targetRole: "DEPARTMENT_CENTRE",
-    allowedIssuerRoles: ["DEPARTMENT_CENTRE_GENERAL", "CENTRE_GENERAL"],
-    requiredApproverRoles: ["DEPARTMENT_CENTRE_GENERAL", "COMITE_NATIONAL"],
+    allowedIssuerRoles: ["DEPARTMENT_CENTRE_REGION", "CENTRE_REGION"],
+    requiredApproverRoles: ["DEPARTMENT_CENTRE_REGION", "COMITE_NATIONAL"],
   },
   {
     targetRole: "DEPARTMENT_CHAPITRE",
     allowedIssuerRoles: ["DEPARTMENT_CENTRE", "CENTRE"],
-    requiredApproverRoles: ["DEPARTMENT_CENTRE", "DEPARTMENT_CENTRE_GENERAL"],
+    requiredApproverRoles: ["DEPARTMENT_CENTRE", "DEPARTMENT_CENTRE_REGION"],
   },
   {
     targetRole: "DEPARTMENT_DISTRICT",
@@ -137,7 +137,7 @@ export const ALL_KNOWN_ROLES: readonly Role[] = [
   "ADMIN",
   "COMITE_NATIONAL",
   "REGION",
-  "CENTRE_GENERAL",
+  "CENTRE_REGION",
   "CENTRE",
   "CHAPITRE",
   "DISTRICT",
@@ -145,7 +145,7 @@ export const ALL_KNOWN_ROLES: readonly Role[] = [
   "SOUS_GROUPE",
   "MEMBRE",
   "DEPARTMENT_COMITE_NATIONAL",
-  "DEPARTMENT_CENTRE_GENERAL",
+  "DEPARTMENT_CENTRE_REGION",
   "DEPARTMENT_CENTRE",
   "DEPARTMENT_CHAPITRE",
   "DEPARTMENT_DISTRICT",
@@ -161,8 +161,8 @@ export const ADMIN_INVITATION_ROLE_OPTIONS: { value: Role; label: string }[] = [
   { value: "COMITE_NATIONAL", label: "Comité national" },
   { value: "REGION", label: "Région" },
   { value: "DEPARTMENT_COMITE_NATIONAL", label: "Département — comité national" },
-  { value: "CENTRE_GENERAL", label: "Centre général" },
-  { value: "DEPARTMENT_CENTRE_GENERAL", label: "Département — centre général" },
+  { value: "CENTRE_REGION", label: "Centre général" },
+  { value: "DEPARTMENT_CENTRE_REGION", label: "Département — centre général" },
   { value: "CENTRE", label: "Centre" },
   { value: "DEPARTMENT_CENTRE", label: "Département — centre" },
   { value: "CHAPITRE", label: "Chapitre" },
@@ -217,7 +217,7 @@ export function getRequiredApproverRoles(targetRole: Role): [Role, Role] | null 
 export const ROLES_WITH_PENDING_TARGET_REDIRECT = new Set<Role>([
   "COMITE_NATIONAL",
   "REGION",
-  "CENTRE_GENERAL",
+  "CENTRE_REGION",
   "CENTRE",
   "CHAPITRE",
   "DISTRICT",
@@ -231,7 +231,7 @@ export const ROLE_DASHBOARD_PATH: Record<Role, string> = {
   ADMIN: "/admin",
   COMITE_NATIONAL: "/comite_national",
   REGION: "/region",
-  CENTRE_GENERAL: "/centre_general",
+  CENTRE_REGION: "/centre_general",
   CENTRE: "/centre",
   CHAPITRE: "/chapitre",
   DISTRICT: "/district",
@@ -239,7 +239,7 @@ export const ROLE_DASHBOARD_PATH: Record<Role, string> = {
   SOUS_GROUPE: "/sous_groupe",
   MEMBRE: "/membre",
   DEPARTMENT_COMITE_NATIONAL: "/departement-comite-national",
-  DEPARTMENT_CENTRE_GENERAL: "/departement-centre-general",
+  DEPARTMENT_CENTRE_REGION: "/departement-centre-general",
   DEPARTMENT_CENTRE: "/departement-centre",
   DEPARTMENT_CHAPITRE: "/departement-chapitre",
   DEPARTMENT_DISTRICT: "/departement-district",
@@ -250,6 +250,20 @@ export const ROLE_DASHBOARD_PATH: Record<Role, string> = {
 
 export function dashboardPathForRole(role: Role): string {
   return ROLE_DASHBOARD_PATH[role] ?? "/";
+}
+
+/** Clerk / DB may still emit pre-rename labels until sessions and webhooks refresh. */
+const LEGACY_SOKA_ROLE_LABELS: Record<string, Role> = {
+  CENTRE_GENERAL: "CENTRE_REGION",
+  DEPARTMENT_CENTRE_GENERAL: "DEPARTMENT_CENTRE_REGION",
+};
+
+export function normalizeJwtRole(
+  role: string | null | undefined,
+): Role | undefined {
+  if (role == null || role === "") return undefined;
+  const resolved = LEGACY_SOKA_ROLE_LABELS[role] ?? (role as Role);
+  return resolved in ROLE_RANK ? resolved : undefined;
 }
 
 export function isAdmin(role: Role | null | undefined): boolean {

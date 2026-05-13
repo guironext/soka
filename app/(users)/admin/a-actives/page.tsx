@@ -22,7 +22,7 @@ export default async function AdminAActivesPage() {
       status: AccountStatus.PENDING_APPROVAL,
       role: null,
       pendingTargetRole: {
-        in: [Role.COMITE_NATIONAL, Role.CENTRE_GENERAL],
+        in: [Role.COMITE_NATIONAL, Role.CENTRE_REGION],
       },
     },
     select: {

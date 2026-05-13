@@ -1,13 +1,16 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { getClerkAuthorizedParties } from "@/lib/app-url";
-import { ROLES_WITH_PENDING_TARGET_REDIRECT } from "@/lib/roles";
+import {
+  normalizeJwtRole,
+  ROLES_WITH_PENDING_TARGET_REDIRECT,
+} from "@/lib/roles";
 
 /** Single source of truth: role ↔ dashboard base path (no trailing wildcard — the guard adds it). */
 const ROLE_ACCESS = [
   { role: "ADMIN" as const, base: "/admin" },
   { role: "COMITE_NATIONAL" as const, base: "/comite_national" },
-  { role: "CENTRE_GENERAL" as const, base: "/centre_general" },
+  { role: "CENTRE_REGION" as const, base: "/centre_general" },
   { role: "CENTRE" as const, base: "/centre" },
   { role: "CHAPITRE" as const, base: "/chapitre" },
   { role: "DISTRICT" as const, base: "/district" },
@@ -15,7 +18,7 @@ const ROLE_ACCESS = [
   { role: "SOUS_GROUPE" as const, base: "/sous_groupe" },
   { role: "MEMBRE" as const, base: "/membre" },
   { role: "DEPARTMENT_COMITE_NATIONAL" as const, base: "/departement-comite-national" },
-  { role: "DEPARTMENT_CENTRE_GENERAL" as const, base: "/departement-centre-general" },
+  { role: "DEPARTMENT_CENTRE_REGION" as const, base: "/departement-centre-general" },
   { role: "DEPARTMENT_CENTRE" as const, base: "/departement-centre" },
   { role: "DEPARTMENT_CHAPITRE" as const, base: "/departement-chapitre" },
   { role: "DEPARTMENT_DISTRICT" as const, base: "/departement-district" },
@@ -102,11 +105,11 @@ function sokaRoleFromClaims(
     | undefined,
 ): SokaRole | undefined {
   if (!claims) return undefined;
-  const fromMetaSoka = claims.metadata?.sokaRole;
+  const fromMetaSoka = normalizeJwtRole(claims.metadata?.sokaRole);
   if (fromMetaSoka && fromMetaSoka in ROLE_HOME) return fromMetaSoka as SokaRole;
-  const fromMetaLegacy = claims.metadata?.role;
+  const fromMetaLegacy = normalizeJwtRole(claims.metadata?.role);
   if (fromMetaLegacy && fromMetaLegacy in ROLE_HOME) return fromMetaLegacy as SokaRole;
-  const fromRoot = claims.sokaRole;
+  const fromRoot = normalizeJwtRole(claims.sokaRole);
   if (fromRoot && fromRoot in ROLE_HOME) return fromRoot as SokaRole;
   return undefined;
 }
@@ -122,9 +125,9 @@ function pendingTargetRoleFromClaims(
     | undefined,
 ): SokaRole | undefined {
   if (!claims) return undefined;
-  const fromMeta = claims.metadata?.sokaPendingTargetRole;
+  const fromMeta = normalizeJwtRole(claims.metadata?.sokaPendingTargetRole);
   if (fromMeta && fromMeta in ROLE_HOME) return fromMeta as SokaRole;
-  const fromRoot = claims.sokaPendingTargetRole;
+  const fromRoot = normalizeJwtRole(claims.sokaPendingTargetRole);
   if (fromRoot && fromRoot in ROLE_HOME) return fromRoot as SokaRole;
   return undefined;
 }
@@ -213,7 +216,7 @@ export default clerkMiddleware(
 
     if (userId && pathname === "/") {
       if (!md?.onboardingCompleted) {
-        if (appRole === "CENTRE_GENERAL") {
+        if (appRole === "CENTRE_REGION") {
           return redirect(req, "/centre_general");
         }
         return redirect(req, "/onboarding");
@@ -277,7 +280,7 @@ export default clerkMiddleware(
     }
 
     if (isOnboardingRoute(req)) {
-      if (appRole === "CENTRE_GENERAL") {
+      if (appRole === "CENTRE_REGION") {
         return redirect(req, "/centre_general");
       }
       if (req.nextUrl.searchParams.get("onboardingCompleted")) {

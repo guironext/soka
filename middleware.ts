@@ -1,14 +1,17 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { getClerkAuthorizedParties } from "@/lib/app-url";
-import { ROLES_WITH_PENDING_TARGET_REDIRECT } from "@/lib/roles";
+import {
+	normalizeJwtRole,
+	ROLES_WITH_PENDING_TARGET_REDIRECT,
+} from "@/lib/roles";
 
 /** Single source of truth: role ↔ dashboard base path (no trailing wildcard — the guard adds it). */
 const ROLE_ACCESS = [
 	{ role: "ADMIN" as const, base: "/admin" },
 	{ role: "COMITE_NATIONAL" as const, base: "/comite_national" },
 	{ role: "REGION" as const, base: "/region" },
-	{ role: "CENTRE_GENERAL" as const, base: "/centre_general" },
+	{ role: "CENTRE_REGION" as const, base: "/centre_general" },
 	{ role: "CENTRE" as const, base: "/centre" },
 	{ role: "CHAPITRE" as const, base: "/chapitre" },
 	{ role: "DISTRICT" as const, base: "/district" },
@@ -20,7 +23,7 @@ const ROLE_ACCESS = [
 		base: "/departement-comite-national",
 	},
 	{
-		role: "DEPARTMENT_CENTRE_GENERAL" as const,
+		role: "DEPARTMENT_CENTRE_REGION" as const,
 		base: "/departement-centre-general",
 	},
 	{ role: "DEPARTMENT_CENTRE" as const, base: "/departement-centre" },
@@ -50,56 +53,16 @@ const isPublicRoute = createRouteMatcher([
 ]);
 const isOnboardingRoute = createRouteMatcher(["/onboarding"]);
 const isAdminAppRoute = createRouteMatcher(["/admin", "/admin/(.*)"]);
-const isComiteNationalAppRoute = createRouteMatcher([
-	"/comite_national",
-	"/comite_national/(.*)",
-]);
-const isRegionAppRoute = createRouteMatcher(["/region", "/region/(.*)"]);
-const isCentreGeneralAppRoute = createRouteMatcher([
-	"/centre_general",
-	"/centre_general/(.*)",
-]);
-const isCentreAppRoute = createRouteMatcher(["/centre", "/centre/(.*)"]);
-const isChapitreAppRoute = createRouteMatcher(["/chapitre", "/chapitre/(.*)"]);
-const isDistrictAppRoute = createRouteMatcher(["/district", "/district/(.*)"]);
-const isGroupeAppRoute = createRouteMatcher(["/groupe", "/groupe/(.*)"]);
-const isSousGroupeAppRoute = createRouteMatcher([
-	"/sous_groupe",
-	"/sous_groupe/(.*)",
-]);
-const isMembreAppRoute = createRouteMatcher(["/membre", "/membre/(.*)"]);
-const isDepartementComiteNationalAppRoute = createRouteMatcher([
-	"/departement-comite-national",
-	"/departement-comite-national/(.*)",
-]);
-const isDepartementCentreGeneralAppRoute = createRouteMatcher([
-	"/departement-centre-general",
-	"/departement-centre-general/(.*)",
-]);
-const isDepartementCentreAppRoute = createRouteMatcher([
-	"/departement-centre",
-	"/departement-centre/(.*)",
-]);
-const isDepartementChapitreAppRoute = createRouteMatcher([
-	"/departement-chapitre",
-	"/departement-chapitre/(.*)",
-]);
-const isDepartementDistrictAppRoute = createRouteMatcher([
-	"/departement-district",
-	"/departement-district/(.*)",
-]);
-const isDepartementGroupeAppRoute = createRouteMatcher([
-	"/departement-groupe",
-	"/departement-groupe/(.*)",
-]);
-const isDepartementSousGroupeAppRoute = createRouteMatcher([
-	"/departement-sous-groupe",
-	"/departement-sous-groupe/(.*)",
-]);
-const isDepartementMembreAppRoute = createRouteMatcher([
-	"/departement-membre",
-	"/departement-membre/(.*)",
-]);
+/**
+ * Non-admin role dashboards (and department mirrors). Same onboarding exemption as
+ * {@link isAdminAppRoute}: JWT may lag; pages enforce access from the DB.
+ */
+const isRoleWorkspaceAppRoute = createRouteMatcher(
+	ROLE_ACCESS.filter((r) => r.role !== "ADMIN").flatMap(({ base }) => [
+		base,
+		`${base}/(.*)`,
+	]),
+);
 /**
  * Waiting room for `PENDING_APPROVAL` users (and the post-onboarding "Activation
  * en cours" screen). Reachable before Clerk `onboardingCompleted` is `true` —
@@ -166,13 +129,13 @@ function sokaRoleFromClaims(
 		| undefined,
 ): SokaRole | undefined {
 	if (!claims) return undefined;
-	const fromMetaSoka = claims.metadata?.sokaRole;
+	const fromMetaSoka = normalizeJwtRole(claims.metadata?.sokaRole);
 	if (fromMetaSoka && fromMetaSoka in ROLE_HOME)
 		return fromMetaSoka as SokaRole;
-	const fromMetaLegacy = claims.metadata?.role;
+	const fromMetaLegacy = normalizeJwtRole(claims.metadata?.role);
 	if (fromMetaLegacy && fromMetaLegacy in ROLE_HOME)
 		return fromMetaLegacy as SokaRole;
-	const fromRoot = claims.sokaRole;
+	const fromRoot = normalizeJwtRole(claims.sokaRole);
 	if (fromRoot && fromRoot in ROLE_HOME) return fromRoot as SokaRole;
 	return undefined;
 }
@@ -188,9 +151,9 @@ function pendingTargetRoleFromClaims(
 		| undefined,
 ): SokaRole | undefined {
 	if (!claims) return undefined;
-	const fromMeta = claims.metadata?.sokaPendingTargetRole;
+	const fromMeta = normalizeJwtRole(claims.metadata?.sokaPendingTargetRole);
 	if (fromMeta && fromMeta in ROLE_HOME) return fromMeta as SokaRole;
-	const fromRoot = claims.sokaPendingTargetRole;
+	const fromRoot = normalizeJwtRole(claims.sokaPendingTargetRole);
 	if (fromRoot && fromRoot in ROLE_HOME) return fromRoot as SokaRole;
 	return undefined;
 }
@@ -323,7 +286,7 @@ export default clerkMiddleware(
 
 		if (userId && pathname === "/") {
 			if (!md?.onboardingCompleted) {
-				if (appRole === "CENTRE_GENERAL") {
+				if (appRole === "CENTRE_REGION") {
 					return redirect(req, "/centre_general");
 				}
 				return redirect(req, "/onboarding");
@@ -502,7 +465,7 @@ export default clerkMiddleware(
 		}
 
 		if (isOnboardingRoute(req)) {
-			if (appRole === "CENTRE_GENERAL") {
+			if (appRole === "CENTRE_REGION") {
 				return redirect(req, "/centre_general");
 			}
 			if (req.nextUrl.searchParams.get("onboardingCompleted")) {
@@ -632,6 +595,7 @@ export default clerkMiddleware(
 		if (
 			!md?.onboardingCompleted &&
 			!isAdminAppRoute(req) &&
+			!isRoleWorkspaceAppRoute(req) &&
 			!isPendingDashboardRoute(req)
 		) {
 			return redirect(req, "/onboarding");

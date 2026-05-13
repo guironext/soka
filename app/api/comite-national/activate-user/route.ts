@@ -9,7 +9,7 @@ import { prisma } from "@/lib/prisma";
 const ACTIVATABLE_BY_COMITE: Role[] = [
   Role.REGION,
   Role.CENTRE,
-  Role.CENTRE_GENERAL,
+  Role.CENTRE_REGION,
 ];
 
 export async function POST(req: Request) {

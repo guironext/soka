@@ -6,7 +6,7 @@ import { canIssueInvitation, dashboardPathForRole } from "@/lib/roles";
 import { CentreGeneralInvitationForm } from "@/app/(users)/centre_general/invitations/invitation-form";
 
 const ALLOWED_TARGETS: { value: Role; label: string }[] = [
-  { value: "CENTRE_GENERAL", label: "Centre général" },
+  { value: "CENTRE_REGION", label: "Centre général" },
   { value: "CENTRE", label: "Centre" },
 ];
 
@@ -22,10 +22,10 @@ export default async function CentreGeneralInvitationsPage() {
   }
 
   /**
-   * This section primarily targets CENTRE_GENERAL users, but we allow COMITE_NATIONAL/ADMIN
+   * This section primarily targets CENTRE_REGION users, but we allow COMITE_NATIONAL/ADMIN
    * to access it if they navigate here; permissions still apply via `canIssueInvitation`.
    */
-  if (!["CENTRE_GENERAL", "COMITE_NATIONAL", "ADMIN"].includes(user.role)) {
+  if (!["CENTRE_REGION", "COMITE_NATIONAL", "ADMIN"].includes(user.role)) {
     redirect(dashboardPathForRole(user.role));
   }
 

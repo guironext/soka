@@ -11,6 +11,7 @@
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "node scripts/prisma-studio-quiet.cjs --browser none",
     "db:studio:open": "node scripts/prisma-studio-quiet.cjs",

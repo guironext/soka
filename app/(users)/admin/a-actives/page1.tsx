@@ -9,7 +9,7 @@ import { getAppUserByClerkId } from "@/lib/app-user";
 import { prisma } from "@/lib/prisma";
 import { ADMIN_INVITATION_ROLE_OPTIONS, isAdmin, ROLE_RANK } from "@/lib/roles";
 
-const LEADER_ROLES: Role[] = ["COMITE_NATIONAL", "CENTRE_GENERAL"];
+const LEADER_ROLES: Role[] = ["COMITE_NATIONAL", "CENTRE_REGION"];
 
 const STATUS_LABELS: Record<AccountStatus, string> = {
   ACTIVE: "Actif",
@@ -88,7 +88,7 @@ export default async function AdminAActivesPage() {
     (r) => r.role === "COMITE_NATIONAL",
   ).length;
   const countCentreGeneral = rows.filter(
-    (r) => r.role === "CENTRE_GENERAL",
+    (r) => r.role === "CENTRE_REGION",
   ).length;
 
   return (

@@ -6,7 +6,7 @@ import { syncClerkAppMetadata } from "@/lib/clerk-sync";
 import { prisma } from "@/lib/prisma";
 import { isAdmin } from "@/lib/roles";
 
-const LEADER_ROLES: Role[] = ["COMITE_NATIONAL", "CENTRE_GENERAL"];
+const LEADER_ROLES: Role[] = ["COMITE_NATIONAL", "CENTRE_REGION"];
 
 export async function POST(req: Request) {
   try {
