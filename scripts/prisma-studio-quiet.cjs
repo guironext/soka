@@ -1,7 +1,9 @@
 /**
- * Runs `prisma studio` and hides stderr spam from Prisma Studio 7.x when HTTP
+ * Runs `npx prisma studio` and hides stderr noise from Prisma Studio 7.x when HTTP
  * clients drop the response early (see https://github.com/prisma/studio/issues/1479).
  * Does not affect the Studio UI or database access.
+ *
+ * Prefer `npm run db:studio` instead of plain `npx prisma studio` if you want this filtering.
  */
 const { spawn } = require("node:child_process");
 const path = require("node:path");
@@ -17,7 +19,15 @@ const child = spawn("npx", ["prisma", "studio", ...studioArgs], {
   env: process.env,
 });
 
-let suppressPrismaStudioPipeBlock = false;
+let suppressPipeClosedBlock = false;
+
+/** Prisma Studio 7.x may log one or two variants; first line is not always prefixed. */
+function isPipeClosedNoiseStart(line) {
+  return (
+    line.includes("ERR_STREAM_UNABLE_TO_PIPE") ||
+    line.includes("Cannot pipe to a closed or destroyed stream")
+  );
+}
 
 const rl = readline.createInterface({
   input: child.stderr,
@@ -25,16 +35,13 @@ const rl = readline.createInterface({
 });
 
 rl.on("line", (line) => {
-  if (
-    line.includes("[Prisma Studio]") &&
-    line.includes("ERR_STREAM_UNABLE_TO_PIPE")
-  ) {
-    suppressPrismaStudioPipeBlock = true;
+  if (!suppressPipeClosedBlock && isPipeClosedNoiseStart(line)) {
+    suppressPipeClosedBlock = true;
     return;
   }
-  if (suppressPrismaStudioPipeBlock) {
+  if (suppressPipeClosedBlock) {
     if (line.trim() === "}") {
-      suppressPrismaStudioPipeBlock = false;
+      suppressPipeClosedBlock = false;
     }
     return;
   }

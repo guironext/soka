@@ -24,6 +24,9 @@ export const metadata: Metadata = {
     "Communication entre membres et organisation pour le territoire Soka Gakkai Côte d'Ivoire.",
 };
 
+const clerkPublishableKey =
+  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? "";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,7 +37,9 @@ export default function RootLayout({
       localization={frFR}
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
-      unsafe_disableDevelopmentModeConsoleWarning={process.env.NODE_ENV === "development"}
+      unsafe_disableDevelopmentModeConsoleWarning={clerkPublishableKey.startsWith(
+        "pk_test_",
+      )}
     >
       <html
         lang="fr"
