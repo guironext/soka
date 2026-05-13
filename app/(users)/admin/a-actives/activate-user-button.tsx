@@ -43,7 +43,7 @@ export function ActivateUserButton({
       });
 
       /**
-       * If middleware (proxy.ts) redirects the POST (e.g. to `/onboarding`),
+       * If middleware redirects the POST (e.g. to `/onboarding`),
        * fetch silently follows the redirect, lands on an HTML page, and we'd
        * otherwise treat that as success. Detect it explicitly and surface a
        * clear error so the bug is loud, not silent.
