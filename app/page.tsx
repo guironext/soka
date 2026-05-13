@@ -33,7 +33,7 @@ export default function Home() {
             <div className="flex w-full max-w-sm flex-col gap-3 sm:flex-row sm:justify-center sm:gap-3">
               <Link
                 href="/sign-up"
-                className="inline-flex min-h-11 flex-1 items-center justify-center rounded-xl bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 active:translate-y-px dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white dark:focus-visible:outline-zinc-200"
+                className="hidden min-h-11 flex-1 items-center justify-center rounded-xl bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 active:translate-y-px dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white dark:focus-visible:outline-zinc-200"
               >
                 S&apos;inscrire
               </Link>
