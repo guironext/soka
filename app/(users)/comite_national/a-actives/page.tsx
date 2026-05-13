@@ -25,9 +25,7 @@ export default async function ComiteNationalAActivesPage() {
     where: {
       status: AccountStatus.PENDING_APPROVAL,
       role: null,
-      pendingTargetRole: {
-        in: [Role.CENTRE, Role.CENTRE_GENERAL],
-      },
+      pendingTargetRole: Role.REGION,
     },
     select: {
       id: true,
@@ -41,23 +39,26 @@ export default async function ComiteNationalAActivesPage() {
     orderBy: [{ createdAt: "desc" }],
   });
 
+  const canActivate = viewer.status === AccountStatus.ACTIVE;
+
   return (
     <PendingLeadersView
       initialRows={rows}
       sectionLabel="Comité national"
-      headingId="comite-national-a-actives-heading"
-      pageHeading="Centres — comptes en attente"
+      pageHeading="Comptes région — à activer"
       description={
         <>
           Utilisateurs au statut{" "}
           <span className="font-medium text-foreground">PENDING_APPROVAL</span>{" "}
-          avec un rôle cible{" "}
-          <span className="font-medium text-foreground">CENTRE</span> ou{" "}
-          <span className="font-medium text-foreground">CENTRE_GENERAL</span>,
-          sans rôle attribué.
+          dont le rôle cible est{" "}
+          <span className="font-medium text-foreground">REGION</span>. L’action
+          attribue le rôle cible et passe le statut à{" "}
+          <span className="font-medium text-foreground">ACTIVE</span>.
         </>
       }
-      emptyStateDescription="Aucune demande en attente pour ce périmètre (CENTRE / CENTRE_GENERAL)."
+      emptyStateDescription="Aucun compte en attente d’activation pour le rôle régional."
+      headingId="comite-national-a-actives-heading"
+      showActivateColumn={canActivate}
       activateEndpoint="/api/comite-national/activate-user"
       activateButtonLabel="Activer"
     />

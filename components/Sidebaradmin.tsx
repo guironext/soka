@@ -9,9 +9,10 @@ import {
 	CalendarDays,
 	Shield,
 	UsersRound,
-	Layers,
 	Users,
 	LayoutGrid,
+	User,
+	BookOpen,
 } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
@@ -40,7 +41,7 @@ const navItems = [
 	{
 		id: 2,
 		icon: UserPlus,
-		label: "A-Actives",
+		label: "A-Activer",
 		href: "/admin/a-actives",
 		category: "main",
 		accent:
@@ -86,21 +87,13 @@ const navItems = [
 	{
 		id: 11,
 		icon: UsersRound,
-		label: "Enregistrement",
-		href: "/admin/enregistrement",
-		category: "main",
+		label: "Structure SGI",
+		href: "/admin/structure-sgi",
+		category: "operations",
 		accent:
 			"text-red-600 dark:text-red-400 group-hover:text-red-700 dark:group-hover:text-red-300",
 	},
-	{
-		id: 12,
-		icon: Layers,
-		label: "Sous-Groupes",
-		href: "/admin/sous-groupes",
-		category: "operations",
-		accent:
-			"text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300",
-	},
+	
 	{
 		id: 13,
 		icon: Users,
@@ -123,8 +116,46 @@ const navItems = [
 		id: 15,
 		icon: MessageSquare,
 		label: "Messages",
-		href: "/rh/messages",
+		href: "/admin/messages",
 		category: "communication",
+		accent:
+			"text-blue-700 dark:text-blue-400 group-hover:text-blue-800 dark:group-hover:text-blue-300",
+	},
+	{
+		id: 17,
+		icon: User,
+		label: "Profile",
+		href: "/admin/profile",
+		category: "main",
+		accent:
+			"text-blue-700 dark:text-blue-400 group-hover:text-blue-800 dark:group-hover:text-blue-300",
+	},
+	{
+		id: 18,
+		icon: BookOpen,
+		label: "Programme",
+		href: "/admin/programme",
+		category: "main",
+		accent:
+			"text-blue-700 dark:text-blue-400 group-hover:text-blue-800 dark:group-hover:text-blue-300",
+	},
+	{
+		id: 16,
+		icon: MessageSquare,
+		label: "Informations",
+		href: "/admin/informations",
+		category: "main",
+		accent:
+			"text-blue-700 dark:text-blue-400 group-hover:text-blue-800 dark:group-hover:text-blue-300",
+	},
+	
+	
+	{
+		id: 19,
+		icon: FileText,
+		label: "Compte rendu",
+		href: "/admin/compte-rendu",
+		category: "main",
 		accent:
 			"text-blue-700 dark:text-blue-400 group-hover:text-blue-800 dark:group-hover:text-blue-300",
 	},

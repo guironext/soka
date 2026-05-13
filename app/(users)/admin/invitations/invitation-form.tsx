@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
+import type React from "react";
 import type { Role } from "@/app/generated/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -135,7 +136,7 @@ export function AdminInvitationForm({ roleOptions }: Props) {
     doubleCheckConfirmed &&
     emailConfirmationOk;
 
-  async function onSubmit(e: FormEvent) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!targetRole) return;
     if (!doubleCheckConfirmed) {
@@ -234,7 +235,34 @@ export function AdminInvitationForm({ roleOptions }: Props) {
                 Inviter un membre
               </span>
             </h1>
-            
+            <p className="max-w-2xl text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+              Créez une invitation à usage unique, avec un lien prêt à copier et un code de secours.
+              Pour éviter les erreurs, vérifiez bien le rôle, la responsabilité et l&apos;e-mail avant
+              validation.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Badge
+                variant="secondary"
+                className="gap-1.5 bg-white/70 text-zinc-800 shadow-sm dark:bg-zinc-900/60 dark:text-zinc-200"
+              >
+                <KeyRound className="size-3.5 opacity-80" aria-hidden />
+                Code de secours
+              </Badge>
+              <Badge
+                variant="secondary"
+                className="gap-1.5 bg-white/70 text-zinc-800 shadow-sm dark:bg-zinc-900/60 dark:text-zinc-200"
+              >
+                <Link2 className="size-3.5 opacity-80" aria-hidden />
+                Lien personnalisable
+              </Badge>
+              <Badge
+                variant="secondary"
+                className="gap-1.5 bg-white/70 text-zinc-800 shadow-sm dark:bg-zinc-900/60 dark:text-zinc-200"
+              >
+                <Send className="size-3.5 opacity-80" aria-hidden />
+                Prêt à envoyer
+              </Badge>
+            </div>
           </div>
         </div>
 
@@ -314,116 +342,181 @@ export function AdminInvitationForm({ roleOptions }: Props) {
               <span className="leading-snug">{banner.text}</span>
             </div>
           ) : null}
-          <form onSubmit={onSubmit} className="flex flex-col gap-5">
-            <div className="space-y-2">
-              <Label htmlFor="inv-email" className="text-foreground">
-                E-mail du destinataire
-              </Label>
-              <Input
-                id="inv-email"
-                type="email"
-                autoComplete="email"
-                placeholder="prenom.nom@exemple.org"
-                value={recipientEmail}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setRecipientEmail(v);
-                  if (!v.trim()) setRecipientEmailConfirm("");
-                }}
-                className="h-10 bg-background/80"
-              />
-              <p className="text-xs text-muted-foreground">
-                Optionnel pour créer le lien ; personnalise le lien et le message dans votre
-                messagerie.
-              </p>
-            </div>
-            {emailProvided ? (
-              <div className="space-y-2">
-                <Label htmlFor="inv-email-confirm" className="text-foreground">
-                  Confirmer l&apos;e-mail du destinataire
-                </Label>
-                <Input
-                  id="inv-email-confirm"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="Saisir la même adresse une seconde fois"
-                  value={recipientEmailConfirm}
-                  onChange={(e) => setRecipientEmailConfirm(e.target.value)}
-                  aria-invalid={emailProvided && !emailConfirmationOk}
-                  className="h-10 bg-background/80"
-                />
-                {emailProvided && !emailConfirmationOk ? (
-                  <p className="text-xs text-destructive" role="alert">
-                    Les deux e-mails doivent être identiques.
-                  </p>
-                ) : (
-                  <p className="text-xs text-muted-foreground">
-                    Double vérification pour éviter une faute de frappe sur l&apos;adresse.
-                  </p>
-                )}
+          <form onSubmit={onSubmit} className="grid gap-6 lg:grid-cols-[1fr_320px]">
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <Mail className="size-4 opacity-80" aria-hidden />
+                  Destinataire
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="inv-email" className="text-foreground">
+                      E-mail du destinataire
+                    </Label>
+                    <Input
+                      id="inv-email"
+                      type="email"
+                      autoComplete="email"
+                      placeholder="prenom.nom@exemple.org"
+                      value={recipientEmail}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setRecipientEmail(v);
+                        if (!v.trim()) setRecipientEmailConfirm("");
+                      }}
+                      className="h-10 bg-background/80"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Optionnel : personnalise le lien (paramètre <span className="font-mono">email</span>) et
+                      prépare le bouton “Ouvrir le client mail”.
+                    </p>
+                  </div>
+                  {emailProvided ? (
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label htmlFor="inv-email-confirm" className="text-foreground">
+                        Confirmer l&apos;e-mail du destinataire
+                      </Label>
+                      <Input
+                        id="inv-email-confirm"
+                        type="email"
+                        autoComplete="email"
+                        placeholder="Saisir la même adresse une seconde fois"
+                        value={recipientEmailConfirm}
+                        onChange={(e) => setRecipientEmailConfirm(e.target.value)}
+                        aria-invalid={emailProvided && !emailConfirmationOk}
+                        className="h-10 bg-background/80"
+                      />
+                      {emailProvided && !emailConfirmationOk ? (
+                        <p className="text-xs text-destructive" role="alert">
+                          Les deux e-mails doivent être identiques.
+                        </p>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">
+                          Double vérification pour éviter une faute de frappe.
+                        </p>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
               </div>
-            ) : null}
-            <div className="space-y-2">
-              <Label htmlFor="inv-responsabilite" className="text-foreground">
-                Responsabilité
-              </Label>
-              <textarea
-                id="inv-responsabilite"
-                required
-                maxLength={500}
-                rows={3}
-                placeholder="Ex. Trésorerie, suivi des adhérents, communication…"
-                value={responsabilite}
-                onChange={(e) => setResponsabilite(e.target.value)}
-                className={cn(
-                  "min-h-20 w-full min-w-0 resize-y rounded-lg border border-input bg-background/80 px-3 py-2.5 text-base shadow-xs transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30",
-                )}
-              />
-              <div className="flex flex-wrap items-center justify-between gap-1 text-xs text-muted-foreground">
-                <span>Obligatoire — mission ou poste couvert (max. 500 caractères).</span>
-                <span className="tabular-nums">{responsabilite.length}/500</span>
+
+              <Separator className="bg-blue-100/80 dark:bg-blue-900/40" />
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <UserPlus className="size-4 opacity-80" aria-hidden />
+                  Détails de l&apos;invitation
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-foreground">Rôle invité</Label>
+                  <Select value={targetRole || undefined} onValueChange={(v) => setTargetRole(v as Role)}>
+                    <SelectTrigger className="h-10 w-full bg-background/80">
+                      <SelectValue placeholder="Choisir un rôle" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {roleOptions.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="inv-responsabilite" className="text-foreground">
+                    Responsabilité
+                  </Label>
+                  <textarea
+                    id="inv-responsabilite"
+                    required
+                    maxLength={500}
+                    rows={4}
+                    placeholder="Ex. Trésorerie, suivi des adhérents, communication…"
+                    value={responsabilite}
+                    onChange={(e) => setResponsabilite(e.target.value)}
+                    className={cn(
+                      "min-h-24 w-full min-w-0 resize-y rounded-lg border border-input bg-background/80 px-3 py-2.5 text-base shadow-xs transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30",
+                    )}
+                  />
+                  <div className="flex flex-wrap items-center justify-between gap-1 text-xs text-muted-foreground">
+                    <span>Obligatoire — mission ou poste couvert (max. 500 caractères).</span>
+                    <span className="tabular-nums">{responsabilite.length}/500</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label className="text-foreground">Rôle invité</Label>
-              <Select
-                value={targetRole || undefined}
-                onValueChange={(v) => setTargetRole(v as Role)}
-              >
-                <SelectTrigger className="h-10 w-full bg-background/80">
-                  <SelectValue placeholder="Choisir un rôle" />
-                </SelectTrigger>
-                <SelectContent>
-                  {roleOptions.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex gap-3 rounded-xl border border-blue-200/70 bg-blue-50/40 px-3 py-3 dark:border-blue-900/45 dark:bg-blue-950/25">
-              <Checkbox
-                id="inv-double-check"
-                checked={doubleCheckConfirmed}
-                onCheckedChange={(v) => setDoubleCheckConfirmed(v === true)}
-                className="mt-0.5"
-              />
-              <Label htmlFor="inv-double-check" className="cursor-pointer text-sm font-normal leading-snug text-foreground">
-                J&apos;ai relu et je confirme le rôle invité, la responsabilité et l&apos;adresse
-                e-mail (si renseignée) avant de créer le lien.
-              </Label>
-            </div>
-            <div className="pt-1">
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full gap-2 sm:w-auto"
-                disabled={loading || !formReadyForSubmit}
-              >
-                <Sparkles className="size-4 opacity-90" aria-hidden />
-                {loading ? "Création…" : "Créer le lien d'invitation"}
-              </Button>
+
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-blue-200/70 bg-white/70 p-4 shadow-sm backdrop-blur-sm dark:border-blue-900/45 dark:bg-zinc-950/50">
+                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <CheckCircle2 className="size-4 opacity-80" aria-hidden />
+                  Résumé
+                </div>
+                <div className="mt-3 space-y-3 text-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Rôle
+                      </div>
+                      <div className="mt-1 truncate font-medium text-foreground">
+                        {targetRole ? displayLabelFor(roleOptions, targetRole as Role) : "—"}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Responsabilité
+                      </div>
+                      <div className="mt-1 line-clamp-3 text-foreground">
+                        {responsabilite.trim() ? responsabilite.trim() : "—"}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Destinataire
+                      </div>
+                      <div className="mt-1 truncate font-mono text-xs text-foreground">
+                        {recipientEmail.trim() ? recipientEmail.trim() : "non renseigné"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <Separator className="my-4 bg-blue-100/80 dark:bg-blue-900/40" />
+                <div className="flex gap-3 rounded-xl border border-blue-200/70 bg-blue-50/40 px-3 py-3 dark:border-blue-900/45 dark:bg-blue-950/25">
+                  <Checkbox
+                    id="inv-double-check"
+                    checked={doubleCheckConfirmed}
+                    onCheckedChange={(v) => setDoubleCheckConfirmed(v === true)}
+                    className="mt-0.5"
+                  />
+                  <Label
+                    htmlFor="inv-double-check"
+                    className="cursor-pointer text-sm font-normal leading-snug text-foreground"
+                  >
+                    Je confirme avoir relu rôle, responsabilité et e-mail (si renseigné).
+                  </Label>
+                </div>
+              </div>
+
+              <div className="sticky top-4 space-y-3">
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full gap-2"
+                  disabled={loading || !formReadyForSubmit}
+                >
+                  <Sparkles className="size-4 opacity-90" aria-hidden />
+                  {loading ? "Création…" : "Créer le lien"}
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  L&apos;invitation expire après <span className="font-medium text-foreground">30 jours</span> et
+                  est limitée à <span className="font-medium text-foreground">1 utilisation</span>.
+                </p>
+              </div>
             </div>
           </form>
         </CardContent>

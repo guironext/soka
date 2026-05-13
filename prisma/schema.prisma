@@ -12,6 +12,7 @@ datasource db {
 enum Role {
   ADMIN
   COMITE_NATIONAL
+  REGION
   CENTRE_GENERAL
   CENTRE
   CHAPITRE

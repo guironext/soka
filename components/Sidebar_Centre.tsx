@@ -40,7 +40,7 @@ type NavItem = {
 const navItems: readonly NavItem[] = [
   { id: 0, icon: Landmark, label: "Accueil", href: "/centre", category: "main", tone: "blue" },
   { id: 1, icon: Home, label: "Invitations", href: "/centre/invitations", category: "main", tone: "yellow" },
-  { id: 2, icon: UserPlus, label: "A-Actives", href: "/centre/a-actives", category: "main", tone: "blue" },
+  { id: 2, icon: UserPlus, label: "A-Activer", href: "/centre/a-actives", category: "main", tone: "blue" },
 
   { id: 3, icon: Store, label: "Boutiques", href: "/centre/boutiques", category: "operations", tone: "yellow" },
   { id: 4, icon: FileText, label: "Abonnements", href: "/centre/abonnements", category: "operations", tone: "blue" },

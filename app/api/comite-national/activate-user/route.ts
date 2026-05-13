@@ -5,7 +5,12 @@ import { getAppUserByClerkId } from "@/lib/app-user";
 import { syncClerkAppMetadata } from "@/lib/clerk-sync";
 import { prisma } from "@/lib/prisma";
 
-const ACTIVATABLE_BY_COMITE: Role[] = [Role.CENTRE, Role.CENTRE_GENERAL];
+/** Pending roles the comité national may finaliser (aligné avec `a-actives`). */
+const ACTIVATABLE_BY_COMITE: Role[] = [
+  Role.REGION,
+  Role.CENTRE,
+  Role.CENTRE_GENERAL,
+];
 
 export async function POST(req: Request) {
   try {
@@ -52,7 +57,13 @@ export async function POST(req: Request) {
       );
     }
     if (!ACTIVATABLE_BY_COMITE.includes(subject.pendingTargetRole)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json(
+        {
+          error:
+            "Ce compte ne peut pas être activé depuis le comité national pour ce rôle cible.",
+        },
+        { status: 403 },
+      );
     }
 
     const targetRole = subject.pendingTargetRole;

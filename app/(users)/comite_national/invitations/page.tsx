@@ -1,11 +1,16 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import type { Role } from "@/app/generated/prisma";
+import { AdminInvitationForm } from "@/app/(users)/admin/invitations/invitation-form";
 import { getAppUserByClerkId } from "@/lib/app-user";
-import { dashboardPathForRole } from "@/lib/roles";
-import { ComiteNationalInvitationForm } from "./invitation-form";
+import {
+  ADMIN_INVITATION_ROLE_OPTIONS,
+  canIssueInvitation,
+  dashboardPathForRole,
+} from "@/lib/roles";
 
-const ALLOWED_TARGETS = new Set<Role>(["CENTRE_GENERAL", "CENTRE"]);
+const REGION_INVITE_OPTION = ADMIN_INVITATION_ROLE_OPTIONS.find(
+  (o) => o.value === "REGION",
+)!;
 
 export default async function ComiteNationalInvitationsPage() {
   const { userId } = await auth();
@@ -22,13 +27,11 @@ export default async function ComiteNationalInvitationsPage() {
     redirect(dashboardPathForRole(user.role));
   }
 
+  const issuerRole = user.status === "ACTIVE" ? user.role : null;
   const roleOptions =
-    user.status === "ACTIVE"
-      ? [
-          { value: "CENTRE_GENERAL" as const, label: "Centre général" },
-          { value: "CENTRE" as const, label: "Centre" },
-        ].filter((o) => ALLOWED_TARGETS.has(o.value as Role))
+    issuerRole && canIssueInvitation(issuerRole, "REGION")
+      ? [REGION_INVITE_OPTION]
       : [];
 
-  return <ComiteNationalInvitationForm roleOptions={roleOptions} />;
+  return <AdminInvitationForm roleOptions={roleOptions} />;
 }

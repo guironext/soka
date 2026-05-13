@@ -1,14 +1,17 @@
 "use client";
 
 import {
+  CalendarDays,
+  ClipboardList,
   Home,
+  Info,
   UserPlus,
   Store,
+  Mail,
   MessageSquare,
   FileText,
   Coins,
   UserCheck,
-  UserX,
   Landmark,
   MapPinned,
   BookOpen,
@@ -38,24 +41,26 @@ type NavItem = {
 };
 
 const navItems: readonly NavItem[] = [
-  { id: 0, icon: Landmark, label: "Accueil", href: "/comite_national", category: "main", tone: "blue" },
-  { id: 1, icon: Home, label: "Invitations", href: "/comite_national/invitations", category: "main", tone: "yellow" },
-  { id: 2, icon: UserPlus, label: "A-Actives", href: "/comite_national/a-actives", category: "main", tone: "blue" },
+  // Principal
+  { id: 0, icon: Home, label: "Accueil", href: "/comite_national", category: "main", tone: "blue" },
+  { id: 1, icon: Mail, label: "Invitations", href: "/comite_national/invitations", category: "main", tone: "yellow" },
+  { id: 2, icon: UserPlus, label: "A-Activer", href: "/comite_national/a-actives", category: "main", tone: "blue" },
+  { id: 3, icon: CalendarDays, label: "Programme", href: "/comite_national/programme", category: "main", tone: "red" },
+  { id: 4, icon: Info, label: "Informations", href: "/comite_national/informations", category: "main", tone: "yellow" },
+  { id: 5, icon: ClipboardList, label: "Compte rendu", href: "/comite_national/compte-rendu", category: "main", tone: "blue" },
+  { id: 6, icon: User, label: "Profile", href: "/comite_national/profile", category: "main", tone: "red" },
 
-  { id: 3, icon: Store, label: "Boutiques", href: "/comite_national/boutiques", category: "operations", tone: "yellow" },
-  { id: 4, icon: FileText, label: "Abonnements", href: "/comite_national/abonnements", category: "operations", tone: "blue" },
-  { id: 5, icon: Coins, label: "Zaïmu", href: "/comite_national/zaimu", category: "operations", tone: "yellow" },
-  { id: 6, icon: UserCheck, label: "Utilisateurs actifs", href: "/comite_national/utilisateurs-actifs", category: "operations", tone: "red" },
-  { id: 7, icon: UserX, label: "Utilisateurs passifs", href: "/comite_national/utilisateurs-passifs", category: "operations", tone: "red" },
-  { id: 8, icon: MapPinned, label: "Centres", href: "/comite_national/centres", category: "operations", tone: "blue" },
-  { id: 9, icon: BookOpen, label: "Chapitres", href: "/comite_national/chapitres", category: "operations", tone: "yellow" },
-  { id: 10, icon: UsersRound, label: "Groupes", href: "/comite_national/groupes", category: "operations", tone: "red" },
-  { id: 11, icon: Layers, label: "Sous-groupes", href: "/comite_national/sous-groupes", category: "operations", tone: "blue" },
-  { id: 12, icon: Users, label: "Membres", href: "/comite_national/membres", category: "operations", tone: "yellow" },
-  { id: 13, icon: LayoutGrid, label: "Départements", href: "/comite_national/departements", category: "operations", tone: "red" },
+  // Opérations
+  { id: 7, icon: Store, label: "Boutiques", href: "/comite_national/boutiques", category: "operations", tone: "yellow" },
+  { id: 8, icon: FileText, label: "Abonnements", href: "/comite_national/abonnements", category: "operations", tone: "blue" },
+  { id: 9, icon: Coins, label: "Zaïmu", href: "/comite_national/zaimu", category: "operations", tone: "red" },
+  { id: 10, icon: UserCheck, label: "Liste des membres", href: "/comite_national/liste-des-membres", category: "operations", tone: "yellow" },
+  
+  { id: 16, icon: LayoutGrid, label: "Départements", href: "/comite_national/departements", category: "operations", tone: "red" },
 
-  { id: 14, icon: MessageSquare, label: "Messages", href: "/comite_national/messages", category: "communication", tone: "blue" },
-  { id: 15, icon: User, label: "Profil", href: "/comite_national/profil", category: "main", tone: "red" },
+  // Communication
+  { id: 17, icon: MessageSquare, label: "Messages", href: "/comite_national/messages", category: "communication", tone: "blue" },
+
 ] as const;
 
 const categoryLabels: Record<Category, string> = {

@@ -8,20 +8,21 @@ export const ROLE_RANK: Record<Role, number> = {
   ADMIN: 20,
   COMITE_NATIONAL: 19,
   DEPARTMENT_COMITE_NATIONAL: 18,
-  CENTRE_GENERAL: 17,
-  DEPARTMENT_CENTRE_GENERAL: 16,
-  CENTRE: 15,
-  DEPARTMENT_CENTRE: 14,
-  CHAPITRE: 13,
-  DEPARTMENT_CHAPITRE: 12,
-  DISTRICT: 11,
-  DEPARTMENT_DISTRICT: 10,
-  GROUPE: 9,
-  DEPARTMENT_GROUPE: 8,
-  SOUS_GROUPE: 7,
-  DEPARTMENT_SOUS_GROUPE: 6,
-  MEMBRE: 5,
-  DEPARTMENT_MEMBRE: 4,
+  REGION: 17,
+  CENTRE_GENERAL: 16,
+  DEPARTMENT_CENTRE_GENERAL: 15,
+  CENTRE: 14,
+  DEPARTMENT_CENTRE: 13,
+  CHAPITRE: 12,
+  DEPARTMENT_CHAPITRE: 11,
+  DISTRICT: 10,
+  DEPARTMENT_DISTRICT: 9,
+  GROUPE: 8,
+  DEPARTMENT_GROUPE: 7,
+  SOUS_GROUPE: 6,
+  DEPARTMENT_SOUS_GROUPE: 5,
+  MEMBRE: 4,
+  DEPARTMENT_MEMBRE: 3,
 };
 
 export type RoleRule = {
@@ -48,6 +49,11 @@ export const ROLE_RULES: RoleRule[] = [
     targetRole: "COMITE_NATIONAL",
     allowedIssuerRoles: ["ADMIN"],
     requiredApproverRoles: ["ADMIN", "COMITE_NATIONAL"],
+  },
+  {
+    targetRole: "REGION",
+    allowedIssuerRoles: ["COMITE_NATIONAL", "ADMIN"],
+    requiredApproverRoles: ["COMITE_NATIONAL", "ADMIN"],
   },
   {
     targetRole: "CENTRE_GENERAL",
@@ -130,6 +136,7 @@ export const ROLE_RULES: RoleRule[] = [
 export const ALL_KNOWN_ROLES: readonly Role[] = [
   "ADMIN",
   "COMITE_NATIONAL",
+  "REGION",
   "CENTRE_GENERAL",
   "CENTRE",
   "CHAPITRE",
@@ -152,6 +159,7 @@ export const ALL_KNOWN_ROLES: readonly Role[] = [
  */
 export const ADMIN_INVITATION_ROLE_OPTIONS: { value: Role; label: string }[] = [
   { value: "COMITE_NATIONAL", label: "Comité national" },
+  { value: "REGION", label: "Région" },
   { value: "DEPARTMENT_COMITE_NATIONAL", label: "Département — comité national" },
   { value: "CENTRE_GENERAL", label: "Centre général" },
   { value: "DEPARTMENT_CENTRE_GENERAL", label: "Département — centre général" },
@@ -208,6 +216,7 @@ export function getRequiredApproverRoles(targetRole: Role): [Role, Role] | null 
  */
 export const ROLES_WITH_PENDING_TARGET_REDIRECT = new Set<Role>([
   "COMITE_NATIONAL",
+  "REGION",
   "CENTRE_GENERAL",
   "CENTRE",
   "CHAPITRE",
@@ -221,6 +230,7 @@ export const ROLES_WITH_PENDING_TARGET_REDIRECT = new Set<Role>([
 export const ROLE_DASHBOARD_PATH: Record<Role, string> = {
   ADMIN: "/admin",
   COMITE_NATIONAL: "/comite_national",
+  REGION: "/region",
   CENTRE_GENERAL: "/centre_general",
   CENTRE: "/centre",
   CHAPITRE: "/chapitre",
