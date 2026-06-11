@@ -2,7 +2,8 @@ import Image from "next/image";
 import { Clock } from "lucide-react";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getAppUserByClerkId, redirectActiveUserToRoleHome } from "@/lib/app-user";
+import { redirectIfReadyForRoleHome } from "@/lib/auth-redirect";
+import { getAppUserByClerkId } from "@/lib/app-user";
 import {
   ROLES_WITH_PENDING_TARGET_REDIRECT,
   dashboardPathForRole,
@@ -38,8 +39,9 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
 
+  await redirectIfReadyForRoleHome(userId);
+
   const appUser = await getAppUserByClerkId(userId);
-  redirectActiveUserToRoleHome(appUser);
   const clerkUser = appUser ? null : await currentUser();
 
   const fullName =

@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       where: { clerkId: data.id },
     });
     if (!existing) {
-      const bootstrap = shouldBootstrapAsAdmin(data.id);
+      const bootstrap = shouldBootstrapAsAdmin(data.id, primaryEmail(data));
       const user = await prisma.user.create({
         data: {
           clerkId: data.id,

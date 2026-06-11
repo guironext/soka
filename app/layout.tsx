@@ -37,6 +37,10 @@ export default function RootLayout({
       localization={frFR}
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
+      signInForceRedirectUrl="/auth/continue"
+      signUpForceRedirectUrl="/auth/continue"
+      signInFallbackRedirectUrl="/auth/continue"
+      signUpFallbackRedirectUrl="/auth/continue"
       unsafe_disableDevelopmentModeConsoleWarning={clerkPublishableKey.startsWith(
         "pk_test_",
       )}

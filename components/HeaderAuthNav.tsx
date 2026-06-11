@@ -17,8 +17,8 @@ export function HeaderAuthNav() {
         </SignInButton>
       </Show>
       <Show when="signed-in">
-        <Link href="/onboarding" className="text-zinc-700 dark:text-zinc-300">
-          Intégration
+        <Link href="/auth/continue" className="text-zinc-700 dark:text-zinc-300">
+          Mon espace
         </Link>
         <UserButton />
       </Show>

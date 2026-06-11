@@ -11,10 +11,16 @@ function vercelDeploymentOrigin(): string | null {
  */
 export function getAppOrigin(): string {
   const explicit = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  const fromVercel = vercelDeploymentOrigin();
+
+  // On Vercel, a leftover localhost APP_URL breaks Clerk session validation.
+  if (fromVercel && (!explicit || explicit.includes("localhost"))) {
+    return fromVercel;
+  }
+
   if (explicit) {
     return explicit.replace(/\/$/, "");
   }
-  const fromVercel = vercelDeploymentOrigin();
   if (fromVercel) {
     return fromVercel;
   }

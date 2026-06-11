@@ -2,17 +2,12 @@ import { SignUp } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { getAppUserByClerkId, redirectUserToRoleHome } from "@/lib/app-user";
+import { redirectSignedInUserToHome } from "@/lib/auth-redirect";
 
 export default async function SignUpPage() {
 	const { userId } = await auth();
 	if (userId) {
-		const user = await getAppUserByClerkId(userId);
-		redirectUserToRoleHome(user);
-		if (user?.status === "PENDING_APPROVAL") {
-			redirect("/dashboard");
-		}
-		redirect("/onboarding");
+		await redirectSignedInUserToHome(userId);
 	}
 
 	return (
@@ -43,7 +38,8 @@ export default async function SignUpPage() {
 					<SignUp
 						routing="path"
 						path="/sign-up"
-						fallbackRedirectUrl="/onboarding"
+						forceRedirectUrl="/auth/continue"
+						fallbackRedirectUrl="/auth/continue"
 						signInUrl="/sign-in"
 						appearance={{
 							elements: { rootBox: "mx-auto" },

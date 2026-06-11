@@ -64,7 +64,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Aucune adresse e-mail sur votre compte Clerk" }, { status: 400 });
   }
 
-  const bootstrap = shouldBootstrapAsAdmin(clerkId);
+  const bootstrap = shouldBootstrapAsAdmin(clerkId, email);
 
   try {
     user = await prisma.user.create({

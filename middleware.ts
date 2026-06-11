@@ -52,6 +52,7 @@ const isPublicRoute = createRouteMatcher([
 	"/api/webhooks/(.*)",
 ]);
 const isOnboardingRoute = createRouteMatcher(["/onboarding"]);
+const isAuthContinueRoute = createRouteMatcher(["/auth/continue"]);
 const isAdminAppRoute = createRouteMatcher(["/admin", "/admin/(.*)"]);
 /**
  * Non-admin role dashboards (and department mirrors). Same onboarding exemption as
@@ -158,6 +159,10 @@ function pendingTargetRoleFromClaims(
 	return undefined;
 }
 
+function postAuthContinueUrl(req: NextRequest): string {
+	return new URL("/auth/continue", req.url).toString();
+}
+
 function redirectForPendingTargetIfNeeded(
 	req: NextRequest,
 	appRole: SokaRole | undefined,
@@ -253,12 +258,13 @@ export default clerkMiddleware(
 		) {
 			const rolePath = redirectPathForRole(appRole);
 			if (rolePath) return redirect(req, rolePath);
+			return redirect(req, "/auth/continue");
 		}
 
 		if (isPublicRoute(req)) return NextResponse.next();
 
 		if (!userId) {
-			return redirectToSignIn({ returnBackUrl: req.url });
+			return redirectToSignIn({ returnBackUrl: postAuthContinueUrl(req) });
 		}
 
 		if (isOnboardingRoute(req)) {
@@ -291,7 +297,8 @@ export default clerkMiddleware(
 			!md?.onboardingCompleted &&
 			!isAdminAppRoute(req) &&
 			!isRoleWorkspaceAppRoute(req) &&
-			!isPendingDashboardRoute(req)
+			!isPendingDashboardRoute(req) &&
+			!isAuthContinueRoute(req)
 		) {
 			return redirect(req, "/onboarding");
 		}

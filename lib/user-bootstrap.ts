@@ -12,6 +12,19 @@ export function getBootstrapAdminClerkIds(): Set<string> {
   );
 }
 
-export function shouldBootstrapAsAdmin(clerkId: string): boolean {
-  return getBootstrapAdminClerkIds().has(clerkId);
+/** Comma-separated admin e-mails (fallback when the Clerk ID env var is not set yet). */
+export function getBootstrapAdminEmails(): Set<string> {
+  const raw = process.env.SOKA_BOOTSTRAP_ADMIN_EMAILS ?? "";
+  return new Set(
+    raw
+      .split(",")
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean),
+  );
+}
+
+export function shouldBootstrapAsAdmin(clerkId: string, email?: string | null): boolean {
+  if (getBootstrapAdminClerkIds().has(clerkId)) return true;
+  const normalized = email?.trim().toLowerCase();
+  return normalized != null && normalized !== "" && getBootstrapAdminEmails().has(normalized);
 }

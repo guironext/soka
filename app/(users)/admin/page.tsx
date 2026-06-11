@@ -10,6 +10,7 @@ import {
   UserCheck,
   Users,
 } from "lucide-react";
+import { ensureBootstrapAdminInDb } from "@/lib/auth-redirect";
 import { getAppUserByClerkId } from "@/lib/app-user";
 import { isAdmin } from "@/lib/roles";
 import { prisma } from "@/lib/prisma";
@@ -31,7 +32,8 @@ export default async function AdminPage() {
     redirect("/sign-in");
   }
 
-  const user = await getAppUserByClerkId(userId);
+  let user = await getAppUserByClerkId(userId);
+  user = (await ensureBootstrapAdminInDb(userId)) ?? user;
   if (!user || !isAdmin(user.role)) {
     redirect("/");
   }
