@@ -1,7 +1,20 @@
 import { SignIn } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
+import { redirect } from "next/navigation";
+import { getAppUserByClerkId, redirectActiveUserToRoleHome } from "@/lib/app-user";
 
-export default function SignInPage() {
+export default async function SignInPage() {
+	const { userId } = await auth();
+	if (userId) {
+		const user = await getAppUserByClerkId(userId);
+		redirectActiveUserToRoleHome(user);
+		if (user?.status === "PENDING_APPROVAL") {
+			redirect("/dashboard");
+		}
+		redirect("/onboarding");
+	}
+
 	return (
 		<main className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-6 py-12 sm:max-w-xl sm:py-16">
 			<div className="rounded-3xl border border-zinc-200/90 bg-white p-8 shadow-[0_1px_0_0_rgba(0,0,0,0.04),0_12px_40px_-12px_rgba(0,0,0,0.08)] dark:border-zinc-800 dark:bg-zinc-900/90 dark:shadow-[0_1px_0_0_rgba(255,255,255,0.04),0_12px_40px_-12px_rgba(0,0,0,0.45)] sm:p-10">

@@ -227,189 +227,8 @@ export default clerkMiddleware(
 
 		if (userId && pathname === "/") {
 			if (!md?.onboardingCompleted) {
-				if (appRole === "ADMIN") {
-					return redirect(req, "/admin");
-				}
-				return redirect(req, "/onboarding");
-			}
-
-			if (
-				pendingRole &&
-				appRole &&
-				ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-			) {
-				const pendingPath = redirectPathForRole(pendingRole);
-				if (pendingPath) return redirect(req, pendingPath);
-			}
-			const homePath = redirectPathForRole(appRole);
-			if (homePath) return redirect(req, homePath);
-		}
-
-		if (userId && pathname === "/") {
-			if (!md?.onboardingCompleted) {
-				if (appRole === "COMITE_NATIONAL") {
-					return redirect(req, "/comite_national");
-				}
-				return redirect(req, "/onboarding");
-			}
-
-			if (
-				pendingRole &&
-				appRole &&
-				ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-			) {
-				const pendingPath = redirectPathForRole(pendingRole);
-				if (pendingPath) return redirect(req, pendingPath);
-			}
-			const homePath = redirectPathForRole(appRole);
-			if (homePath) return redirect(req, homePath);
-		}
-
-		if (userId && pathname === "/") {
-			if (!md?.onboardingCompleted) {
-				if (appRole === "REGION") {
-					return redirect(req, "/region");
-				}
-				return redirect(req, "/onboarding");
-			}
-
-			if (
-				pendingRole &&
-				appRole &&
-				ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-			) {
-				const pendingPath = redirectPathForRole(pendingRole);
-				if (pendingPath) return redirect(req, pendingPath);
-			}
-			const homePath = redirectPathForRole(appRole);
-			if (homePath) return redirect(req, homePath);
-		}
-
-		if (userId && pathname === "/") {
-			if (!md?.onboardingCompleted) {
-				if (appRole === "CENTRE_REGION") {
-					return redirect(req, "/centre_general");
-				}
-				return redirect(req, "/onboarding");
-			}
-
-			if (
-				pendingRole &&
-				appRole &&
-				ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-			) {
-				const pendingPath = redirectPathForRole(pendingRole);
-				if (pendingPath) return redirect(req, pendingPath);
-			}
-			const homePath = redirectPathForRole(appRole);
-			if (homePath) return redirect(req, homePath);
-		}
-
-		if (userId && pathname === "/") {
-			if (!md?.onboardingCompleted) {
-				if (appRole === "CENTRE") {
-					return redirect(req, "/centre");
-				}
-				return redirect(req, "/onboarding");
-			}
-
-			if (
-				pendingRole &&
-				appRole &&
-				ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-			) {
-				const pendingPath = redirectPathForRole(pendingRole);
-				if (pendingPath) return redirect(req, pendingPath);
-			}
-			const homePath = redirectPathForRole(appRole);
-			if (homePath) return redirect(req, homePath);
-		}
-
-		if (userId && pathname === "/") {
-			if (!md?.onboardingCompleted) {
-				if (appRole === "CHAPITRE") {
-					return redirect(req, "/chapitre");
-				}
-				return redirect(req, "/onboarding");
-			}
-
-			if (
-				pendingRole &&
-				appRole &&
-				ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-			) {
-				const pendingPath = redirectPathForRole(pendingRole);
-				if (pendingPath) return redirect(req, pendingPath);
-			}
-			const homePath = redirectPathForRole(appRole);
-			if (homePath) return redirect(req, homePath);
-		}
-
-		if (userId && pathname === "/") {
-			if (!md?.onboardingCompleted) {
-				if (appRole === "DISTRICT") {
-					return redirect(req, "/district");
-				}
-				return redirect(req, "/onboarding");
-			}
-
-			if (
-				pendingRole &&
-				appRole &&
-				ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-			) {
-				const pendingPath = redirectPathForRole(pendingRole);
-				if (pendingPath) return redirect(req, pendingPath);
-			}
-			const homePath = redirectPathForRole(appRole);
-			if (homePath) return redirect(req, homePath);
-		}
-
-		if (userId && pathname === "/") {
-			if (!md?.onboardingCompleted) {
-				if (appRole === "GROUPE") {
-					return redirect(req, "/groupe");
-				}
-				return redirect(req, "/onboarding");
-			}
-
-			if (
-				pendingRole &&
-				appRole &&
-				ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-			) {
-				const pendingPath = redirectPathForRole(pendingRole);
-				if (pendingPath) return redirect(req, pendingPath);
-			}
-			const homePath = redirectPathForRole(appRole);
-			if (homePath) return redirect(req, homePath);
-		}
-
-		if (userId && pathname === "/") {
-			if (!md?.onboardingCompleted) {
-				if (appRole === "SOUS_GROUPE") {
-					return redirect(req, "/sous_groupe");
-				}
-				return redirect(req, "/onboarding");
-			}
-
-			if (
-				pendingRole &&
-				appRole &&
-				ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-			) {
-				const pendingPath = redirectPathForRole(pendingRole);
-				if (pendingPath) return redirect(req, pendingPath);
-			}
-			const homePath = redirectPathForRole(appRole);
-			if (homePath) return redirect(req, homePath);
-		}
-
-		if (userId && pathname === "/") {
-			if (!md?.onboardingCompleted) {
-				if (appRole === "MEMBRE") {
-					return redirect(req, "/membre");
-				}
+				const rolePath = redirectPathForRole(appRole);
+				if (rolePath) return redirect(req, rolePath);
 				return redirect(req, "/onboarding");
 			}
 
@@ -432,9 +251,6 @@ export default clerkMiddleware(
 		}
 
 		if (isOnboardingRoute(req)) {
-			if (appRole === "ADMIN") {
-				return redirect(req, "/admin");
-			}
 			if (req.nextUrl.searchParams.get("onboardingCompleted")) {
 				let dest =
 					pendingRole &&
@@ -445,142 +261,9 @@ export default clerkMiddleware(
 				dest = dest ?? redirectPathForRole(appRole) ?? "/";
 				return redirect(req, dest);
 			}
-			return NextResponse.next();
-		}
-
-		if (isOnboardingRoute(req)) {
-			if (appRole === "COMITE_NATIONAL") {
-				return redirect(req, "/comite_national");
-			}
-			if (req.nextUrl.searchParams.get("onboardingCompleted")) {
-				let dest =
-					pendingRole &&
-					appRole &&
-					ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-						? redirectPathForRole(pendingRole)
-						: null;
-				dest = dest ?? redirectPathForRole(appRole) ?? "/";
-				return redirect(req, dest);
-			}
-			return NextResponse.next();
-		}
-
-		if (isOnboardingRoute(req)) {
-			if (appRole === "CENTRE_REGION") {
-				return redirect(req, "/centre_general");
-			}
-			if (req.nextUrl.searchParams.get("onboardingCompleted")) {
-				let dest =
-					pendingRole &&
-					appRole &&
-					ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-						? redirectPathForRole(pendingRole)
-						: null;
-				dest = dest ?? redirectPathForRole(appRole) ?? "/";
-				return redirect(req, dest);
-			}
-			return NextResponse.next();
-		}
-
-		if (isOnboardingRoute(req)) {
-			if (appRole === "CENTRE") {
-				return redirect(req, "/centre");
-			}
-			if (req.nextUrl.searchParams.get("onboardingCompleted")) {
-				let dest =
-					pendingRole &&
-					appRole &&
-					ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-						? redirectPathForRole(pendingRole)
-						: null;
-				dest = dest ?? redirectPathForRole(appRole) ?? "/";
-				return redirect(req, dest);
-			}
-			return NextResponse.next();
-		}
-
-		if (isOnboardingRoute(req)) {
-			if (appRole === "CHAPITRE") {
-				return redirect(req, "/chapitre");
-			}
-			if (req.nextUrl.searchParams.get("onboardingCompleted")) {
-				let dest =
-					pendingRole &&
-					appRole &&
-					ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-						? redirectPathForRole(pendingRole)
-						: null;
-				dest = dest ?? redirectPathForRole(appRole) ?? "/";
-				return redirect(req, dest);
-			}
-			return NextResponse.next();
-		}
-
-		if (isOnboardingRoute(req)) {
-			if (appRole === "DISTRICT") {
-				return redirect(req, "/district");
-			}
-			if (req.nextUrl.searchParams.get("onboardingCompleted")) {
-				let dest =
-					pendingRole &&
-					appRole &&
-					ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-						? redirectPathForRole(pendingRole)
-						: null;
-				dest = dest ?? redirectPathForRole(appRole) ?? "/";
-				return redirect(req, dest);
-			}
-			return NextResponse.next();
-		}
-
-		if (isOnboardingRoute(req)) {
-			if (appRole === "GROUPE") {
-				return redirect(req, "/groupe");
-			}
-			if (req.nextUrl.searchParams.get("onboardingCompleted")) {
-				let dest =
-					pendingRole &&
-					appRole &&
-					ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-						? redirectPathForRole(pendingRole)
-						: null;
-				dest = dest ?? redirectPathForRole(appRole) ?? "/";
-				return redirect(req, dest);
-			}
-			return NextResponse.next();
-		}
-
-		if (isOnboardingRoute(req)) {
-			if (appRole === "SOUS_GROUPE") {
-				return redirect(req, "/sous_groupe");
-			}
-			if (req.nextUrl.searchParams.get("onboardingCompleted")) {
-				let dest =
-					pendingRole &&
-					appRole &&
-					ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-						? redirectPathForRole(pendingRole)
-						: null;
-				dest = dest ?? redirectPathForRole(appRole) ?? "/";
-				return redirect(req, dest);
-			}
-			return NextResponse.next();
-		}
-
-		if (isOnboardingRoute(req)) {
-			if (appRole === "MEMBRE") {
-				return redirect(req, "/membre");
-			}
-			if (req.nextUrl.searchParams.get("onboardingCompleted")) {
-				let dest =
-					pendingRole &&
-					appRole &&
-					ROLES_WITH_PENDING_TARGET_REDIRECT.has(appRole)
-						? redirectPathForRole(pendingRole)
-						: null;
-				dest = dest ?? redirectPathForRole(appRole) ?? "/";
-
-				return redirect(req, dest);
+			if (md?.onboardingCompleted && appRole) {
+				const path = redirectPathForRole(appRole);
+				if (path) return redirect(req, path);
 			}
 			return NextResponse.next();
 		}
@@ -612,6 +295,10 @@ export default clerkMiddleware(
 		 * The page authorizes against the DB and decides what to render or redirect.
 		 */
 		if (isPendingDashboardRoute(req)) {
+			if (md?.onboardingCompleted && appRole) {
+				const path = redirectPathForRole(appRole);
+				if (path) return redirect(req, path);
+			}
 			return NextResponse.next();
 		}
 
