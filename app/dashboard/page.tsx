@@ -73,7 +73,7 @@ export default async function DashboardPage() {
             <div className="flex h-29 w-29 shrink-0 items-center justify-center rounded-[1.375rem] bg-linear-to-br from-zinc-50 to-zinc-100/80 ring-1 ring-zinc-200/90 shadow-inner dark:from-zinc-950 dark:to-zinc-900/90 dark:ring-zinc-800 sm:h-33 sm:w-33 sm:rounded-2xl">
               <Image
                 src="/logo.png"
-                alt="SOKA GAKKAI CÔTE D'IVOIRE"
+                alt="COMMUNAUTE"
                 width={240}
                 height={240}
                 className="h-19 w-auto max-w-33 object-contain sm:h-22 sm:max-w-35"

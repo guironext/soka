@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Soka Hub — Espace membres",
   description:
-    "Communication entre membres et organisation pour le territoire Soka Gakkai Côte d'Ivoire.",
+    "Communication entre membres et organisation pour le territoire COMMUNAUTE.",
 };
 
 const clerkPublishableKey =

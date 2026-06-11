@@ -10,7 +10,7 @@ export default function SignUpPage() {
 						<div className="flex h-28 w-28 items-center justify-center rounded-2xl bg-zinc-50 ring-1 ring-zinc-200/80 dark:bg-zinc-950 dark:ring-zinc-800 sm:h-32 sm:w-32">
 							<Image
 								src="/logo.png"
-								alt="SOKA GAKKAI CÔTE D'IVOIRE"
+								alt="COMMUNAUTE"
 								width={240}
 								height={240}
 								className="h-20 w-auto max-w-28 object-contain sm:h-24 sm:max-w-32"
