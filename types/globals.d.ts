@@ -32,6 +32,7 @@ declare global {
     sokaPendingTargetRole?: SokaJwtRole | null;
     metadata?: {
       role?: SokaJwtRole;
+      sokaRole?: SokaJwtRole;
       onboardingCompleted?: boolean;
       sokaPendingTargetRole?: SokaJwtRole;
     };

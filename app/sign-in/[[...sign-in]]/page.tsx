@@ -2,13 +2,31 @@ import { SignIn } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { getAppUserByClerkId, redirectActiveUserToRoleHome } from "@/lib/app-user";
+import { getAppUserByClerkId, redirectUserToRoleHome } from "@/lib/app-user";
+import { dashboardPathForRole, isAdmin, normalizeJwtRole } from "@/lib/roles";
+
+function adminRoleFromSessionClaims(
+	sessionClaims: CustomJwtSessionClaims | null | undefined,
+) {
+	if (!sessionClaims) return undefined;
+	const md = sessionClaims.metadata;
+	const fromClaims = normalizeJwtRole(
+		md?.sokaRole ?? md?.role ?? sessionClaims.sokaRole ?? undefined,
+	);
+	return isAdmin(fromClaims) ? fromClaims : undefined;
+}
 
 export default async function SignInPage() {
-	const { userId } = await auth();
+	const { userId, sessionClaims } = await auth();
 	if (userId) {
 		const user = await getAppUserByClerkId(userId);
-		redirectActiveUserToRoleHome(user);
+		redirectUserToRoleHome(user);
+
+		const jwtAdminRole = adminRoleFromSessionClaims(sessionClaims);
+		if (jwtAdminRole) {
+			redirect(dashboardPathForRole(jwtAdminRole));
+		}
+
 		if (user?.status === "PENDING_APPROVAL") {
 			redirect("/dashboard");
 		}

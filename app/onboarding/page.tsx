@@ -1,6 +1,6 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getAppUserByClerkId, redirectActiveUserToRoleHome } from "@/lib/app-user";
+import { getAppUserByClerkId, redirectUserToRoleHome } from "@/lib/app-user";
 import { Suspense } from "react";
 import { OnboardingProfileForm } from "./profile-form";
 import { OnboardingRegisterForm } from "./register-form";
@@ -39,7 +39,7 @@ export default async function OnboardingPage() {
     );
   }
 
-  redirectActiveUserToRoleHome(user);
+  redirectUserToRoleHome(user);
 
   if (user.status === "PENDING_APPROVAL" && user.pendingTargetRole) {
     redirect("/dashboard");

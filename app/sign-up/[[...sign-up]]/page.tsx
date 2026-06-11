@@ -2,13 +2,13 @@ import { SignUp } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { getAppUserByClerkId, redirectActiveUserToRoleHome } from "@/lib/app-user";
+import { getAppUserByClerkId, redirectUserToRoleHome } from "@/lib/app-user";
 
 export default async function SignUpPage() {
 	const { userId } = await auth();
 	if (userId) {
 		const user = await getAppUserByClerkId(userId);
-		redirectActiveUserToRoleHome(user);
+		redirectUserToRoleHome(user);
 		if (user?.status === "PENDING_APPROVAL") {
 			redirect("/dashboard");
 		}

@@ -262,7 +262,11 @@ export function normalizeJwtRole(
   role: string | null | undefined,
 ): Role | undefined {
   if (role == null || role === "") return undefined;
-  const resolved = LEGACY_SOKA_ROLE_LABELS[role] ?? (role as Role);
+  const upper = role.toUpperCase();
+  const resolved =
+    LEGACY_SOKA_ROLE_LABELS[role] ??
+    LEGACY_SOKA_ROLE_LABELS[upper] ??
+    (upper as Role);
   return resolved in ROLE_RANK ? resolved : undefined;
 }
 

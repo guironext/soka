@@ -244,6 +244,17 @@ export default clerkMiddleware(
 			if (homePath) return redirect(req, homePath);
 		}
 
+		if (
+			userId &&
+			(pathname === "/sign-in" ||
+				pathname.startsWith("/sign-in/") ||
+				pathname === "/sign-up" ||
+				pathname.startsWith("/sign-up/"))
+		) {
+			const rolePath = redirectPathForRole(appRole);
+			if (rolePath) return redirect(req, rolePath);
+		}
+
 		if (isPublicRoute(req)) return NextResponse.next();
 
 		if (!userId) {
@@ -261,7 +272,7 @@ export default clerkMiddleware(
 				dest = dest ?? redirectPathForRole(appRole) ?? "/";
 				return redirect(req, dest);
 			}
-			if (md?.onboardingCompleted && appRole) {
+			if (appRole) {
 				const path = redirectPathForRole(appRole);
 				if (path) return redirect(req, path);
 			}
