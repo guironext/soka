@@ -35,7 +35,7 @@ export default async function AdminPage() {
   let user = await getAppUserByClerkId(userId);
   user = (await ensureBootstrapAdminInDb(userId)) ?? user;
   if (!user || !isAdmin(user.role)) {
-    redirect("/");
+    redirect("/auth/continue");
   }
 
   const displayName =

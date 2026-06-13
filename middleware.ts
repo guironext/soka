@@ -53,6 +53,7 @@ const isPublicRoute = createRouteMatcher([
 ]);
 const isOnboardingRoute = createRouteMatcher(["/onboarding"]);
 const isAuthContinueRoute = createRouteMatcher(["/auth/continue"]);
+const isAuthResolveApi = createRouteMatcher(["/api/auth/resolve-home"]);
 const isAdminAppRoute = createRouteMatcher(["/admin", "/admin/(.*)"]);
 /**
  * Non-admin role dashboards (and department mirrors). Same onboarding exemption as
@@ -289,6 +290,10 @@ export default clerkMiddleware(
 			return NextResponse.next();
 		}
 
+		if (isAuthResolveApi(req) && userId) {
+			return NextResponse.next();
+		}
+
 		if (isAdminSupportApi(req) && userId) {
 			return NextResponse.next();
 		}
@@ -343,7 +348,11 @@ export default clerkMiddleware(
 	{
 		signInUrl: "/sign-in",
 		signUpUrl: "/sign-up",
-		authorizedParties: getClerkAuthorizedParties(),
+		// Only enforce azp when explicitly configured — avoids prod sign-in loops when
+		// NEXT_PUBLIC_APP_URL / Vercel alias differ from the JWT `azp` claim.
+		...(process.env.CLERK_AUTHORIZED_PARTIES?.trim()
+			? { authorizedParties: getClerkAuthorizedParties() }
+			: {}),
 	},
 );
 
